@@ -15,17 +15,27 @@ module decoder_tb;
 	decoder d(.clk(clk),.rst(rst),.instruction_i(instruction_o),.rs1_o(rs1_o),.rs2_o(rs2_o),.rd_o(rd_o));
 	initial begin
 		
-		logic [31:0] in = riscv::addi(5'b00000,5'b00001,12);
-		logic [31:0] lhu = riscv::load(12,riscv::x1,riscv::x2,riscv::HWORD,riscv::UNSIGNED);
 		@(posedge clk);
 		@(posedge clk);
 
 		instruction_o = riscv::addi(riscv::x0,riscv::x0,0);
 		@(posedge clk);
+		instruction_o = riscv::store(riscv::x1,riscv::x5,1,2,riscv::HWORD);
 		@(posedge clk);
-
-
-
+		instruction_o = riscv::store(riscv::x1,riscv::x6,1,2,riscv::BYTE);
+		@(posedge clk);
+		instruction_o = riscv::store(riscv::x1,riscv::x7,1,2,riscv::WORD);
+		@(posedge clk);
+		instruction_o = riscv::load(15,riscv::x1,riscv::x8,riscv::BYTE,riscv::UNSIGNED);
+		@(posedge clk);
+		instruction_o = riscv::load(15,riscv::x1,riscv::x9,riscv::HWORD,riscv::UNSIGNED);
+		@(posedge clk);
+		instruction_o = riscv::load(15,riscv::x1,riscv::x8,riscv::WORD,riscv::SIGNED);
+		@(posedge clk);
+		instruction_o = riscv::load(15,riscv::x1,riscv::x9,riscv::BYTE,riscv::SIGNED);
+		@(posedge clk);
+		instruction_o = riscv::load(15,riscv::x1,riscv::x9,riscv::HWORD,riscv::SIGNED);
+		@(posedge clk);
 		$finish;
     end
 
