@@ -2,6 +2,7 @@
 
 
 module decoder_tb;
+	import core::*;
 	import riscv::*;
 	logic clk=1;
 	logic rst=0;
@@ -9,10 +10,11 @@ module decoder_tb;
 	logic [4:0] rs2_o;
 	logic [4:0] rd_o;
 	logic [31:0] instruction_o;
+	core::ALU_OP_t alu_op;
 	always# (`CLK_PERIOD) clk = ~clk;
 	riscv::reg_t register;	
-	
-	decoder d(.clk(clk),.rst(rst),.instruction_i(instruction_o),.rs1_o(rs1_o),.rs2_o(rs2_o),.rd_o(rd_o));
+		
+	decoder d(.clk(clk),.rst(rst),.instruction_i(instruction_o),.rs1_o(rs1_o),.rs2_o(rs2_o),.rd_o(rd_o),.alu_op_o(alu_op));
 	initial begin
 		
 		@(posedge clk);
@@ -20,6 +22,8 @@ module decoder_tb;
 
 		instruction_o = riscv::addi(riscv::x0,riscv::x0,0);
 		@(posedge clk);
+
+		$display("ALU_OP : %s",alu_op.name);
 		instruction_o = riscv::store(riscv::x1,riscv::x5,1,2,riscv::HWORD);
 		@(posedge clk);
 		instruction_o = riscv::store(riscv::x1,riscv::x6,1,2,riscv::BYTE);
