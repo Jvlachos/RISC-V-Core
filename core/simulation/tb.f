@@ -1,0 +1,1 @@
+../synthesis/decoder.sv
