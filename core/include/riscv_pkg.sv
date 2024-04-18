@@ -146,11 +146,11 @@ package riscv;
         return {SRAI_func,shamt,rs,SRLI_SRAI,rd,I_OP};        
     endfunction
 
-    function automatic logic [31:0] store(logic [4:0] rs1,logic [4:0] rs2,logic [6:0] imm,logic [4:0] offset,logic [1:0] size);
+    function automatic logic [31:0] store(logic [4:0] rs2,logic [4:0] rs1,logic [6:0] imm,logic [4:0] offset,logic [1:0] size);
         return {imm,rs2,rs1,{1'b0,size},offset,S_OP};        
     endfunction
 
-    function automatic logic [31:0] load(logic [11:0] imm,logic [4:0] rs,logic [4:0] rd,logic [1:0] size,logic sign);
+    function automatic logic [31:0] load(logic [11:0] imm,logic [4:0] rd,logic [4:0] rs,logic [1:0] size,logic sign);
         return {imm,rs,{sign,size},rd,L_OP};        
     endfunction
 
