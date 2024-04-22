@@ -2,7 +2,7 @@
 
 package riscv;
 
-    typedef enum  { 
+    typedef enum logic { 
         SIGNED = 1'b0,
         UNSIGNED = 1'b1
     } sign_t;
@@ -77,36 +77,49 @@ package riscv;
     localparam  S_OP     =   7'b0100011;
 
     localparam  I_OP     =   7'b0010011;
-    localparam  ADDI_F3  =   3'b000;
-    localparam  SLTI_F3  =   3'b010;
-    localparam  SLTIU_F3 =   3'b011;
-    localparam  XORI_F3  =   3'b100;
-    localparam  ORI_F3   =   3'b110;
-    localparam  ANDI_F3  =   3'b111;
-    localparam  SLLI_F3  =   3'b001;
+
+    typedef enum logic [2:0] {
+    ADDI_F3  =   3'b000,
+    SLTI_F3  =   3'b010,
+    SLTIU_F3 =   3'b011,
+    XORI_F3  =   3'b100,
+    ORI_F3   =   3'b110,
+    ANDI_F3  =   3'b111,
+    SLLI_F3  =   3'b001,
+    SRLI_SRAI=   3'b101
+
+    } I_F3_t;
+
     localparam  SLLI_F7  =   7'b0000000;
-    localparam  SRLI_SRAI=   3'b101;
     localparam  SRLI_func=   7'b0000000;
     localparam  SRAI_func=   7'b0100000;
 
 
     localparam  RR_OP   =    7'b0110011;
-    localparam  ADD_SUB =    3'b000;
-    localparam  SLL     =    3'b001;
-    localparam  SLT     =    3'b010;
-    localparam  SLTU    =    3'b011;
-    localparam  XOR     =    3'b100;
-    localparam  SRL_SRA =    3'b101;
-    localparam  OR      =    3'b110;
-    localparam  AND     =    3'b111;
-    localparam  ADD_func=    7'b0000000;
-    localparam  SUB_func=    7'b0100000;
-    localparam  SRL_func=    7'b0000000;
-    localparam  SRA_func=    7'b0100000;
+    typedef enum logic [2:0]{
+    ADD_SUB =    3'b000,
+    SLL     =    3'b001,
+    SLT     =    3'b010,
+    SLTU    =    3'b011,
+    XOR     =    3'b100,
+    SRL_SRA =    3'b101,
+    OR      =    3'b110,
+    AND     =    3'b111
+    } R_F3_t;
+
+    localparam  ADD_SRL_func=    7'b0000000;
+    localparam  SUB_SRA_func=    7'b0100000;
+    
 
     localparam  E_OP    =    7'b1110011;
     localparam  ECALL_i =    12'b000000000000;
     localparam  EBR_i   =    12'b000000000001;
+
+    function automatic logic [31:0] gen_rr(logic [4:0] rs2,logic [4:0] rs1,R_F3_t f3,logic [4:0] rd ,logic select);
+        logic [6:0] f7 = ((f3 == ADD_SUB || f3 == SRL_SRA) && select) ? SUB_SRA_func : ADD_SRL_func;
+        return {f7,rs2,rs1,f3,rd,RR_OP};
+    endfunction
+
     //I Format Generation
     function automatic logic [31:0] addi(logic [4:0] rd,logic [4:0] rs,logic [11:0] imm);
         return {imm,rs,ADDI_F3,rd,I_OP};        
@@ -154,8 +167,17 @@ package riscv;
         return {imm,rs,{sign,size},rd,L_OP};        
     endfunction
 
+    function automatic logic [31:0] store_num(logic [4:0] rs2,logic [4:0] rs1,logic [11:0] num,logic [1:0] size);
+        logic [6:0] imm;
+        logic [4:0] offset;
+        imm = num[11:5];
+        offset = num [4:0];
+        return {imm,rs2,rs1,{1'b0,size},offset,S_OP};        
+    endfunction
 
-
+    function automatic print_r(string id,reg_t rs2,reg_t rs1,reg_t rd);
+        $display("%s %s,%s,%s\n",id,rd,rs1,rs2);
+    endfunction
 
 endpackage
 

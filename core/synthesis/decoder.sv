@@ -1,5 +1,3 @@
-`include "../include/riscv_pkg.sv"
-`include "../include/core_pkg.sv"
 module decoder
     import core::*;
     import riscv::*;
@@ -10,26 +8,32 @@ module decoder
    output logic [4:0] rs1_o,
    output logic [4:0] rs2_o,
    output logic [4:0] rd_o,
-   output logic [4:0] alu_op_o
+   output core::ALU_OP_t alu_op_o,
+   output logic [2:0] format_o
 );
    riscv::instruction_t instruction;
    assign instruction = riscv::instruction_t'(instruction_i); 
    riscv::reg_t rs1_t;
    riscv::reg_t rs2_t;
    riscv::reg_t rd_t;
-
+   
    always_comb begin : instr_decoder
+      format_o = core::NOP;
        case (instruction.instruction[6:0])
          riscv::I_OP: begin
             rs1_o = instruction.itype.rs1;
             rd_o  = instruction.itype.rd;
             rs1_t = riscv::reg_t'(rs1_o);
             rd_t  = riscv::reg_t'(rd_o);
-
+            format_o = core::I_FORMAT;
             unique case (instruction.itype.funct3)
                riscv::ADDI_F3: begin  
-                  alu_op_o = core::ALU_ADD;
-                  $display("addi %s,%s,%d\n",rd_t.name(),rs1_t.name(),instruction.itype.imm);
+                  if(rs1_o == 5'b0 && rd_o == 5'b0 && instruction.itype.imm ==0 )
+                     $display("NOP\n");
+                  else begin;
+                     alu_op_o = core::ALU_ADD;
+                     $display("addi %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+                  end
                end
                riscv::SLTI_F3: begin
                   alu_op_o = core::ALU_SLT;
@@ -74,6 +78,7 @@ module decoder
           end
 
          riscv::S_OP: begin 
+            format_o = core::S_FORMAT;
             rs1_o = instruction.stype.rs1;
             rs2_o  = instruction.stype.rs2;
             rs1_t = riscv::reg_t'(rs1_o);
@@ -106,7 +111,62 @@ module decoder
          riscv::JAL_OP: begin; end
          riscv::JALR_OP: begin; end
          riscv::B_OP: begin; end
-         riscv::RR_OP: begin; end
+         riscv::RR_OP: begin;
+            format_o = core::R_FORMAT;
+            rs1_o = instruction.rtype.rs1;
+            rs2_o = instruction.rtype.rs2;
+            rd_o  = instruction.rtype.rd;
+            rs1_t = riscv::reg_t'(rs1_o);
+            rd_t  = riscv::reg_t'(rd_o);
+            rs2_t  = riscv::reg_t'(rs2_o);
+            unique case(instruction.rtype.funct3) 
+               riscv::ADD_SUB: begin;
+                  case(instruction.rtype.funct7)
+                     riscv::ADD_SRL_func:begin;
+                        riscv::print_r("add",rs2_t,rs1_t,rd_t);
+                     end
+
+                     riscv::SUB_SRA_func:begin;
+                        riscv::print_r("sub",rs2_t,rs1_t,rd_t);
+                     end
+
+                    default:$display("Illegal add/sub?\n");
+                  endcase
+               end
+               riscv::SLL:begin;
+                  riscv::print_r("sll",rs2_t,rs1_t,rd_t);
+               end
+               riscv::SLT:begin;
+                  riscv::print_r("slt",rs2_t,rs1_t,rd_t);
+               end
+               riscv::SLTU:begin;
+                  riscv::print_r("sltu",rs2_t,rs1_t,rd_t);
+               end
+               riscv::XOR:begin;
+                  riscv::print_r("xor",rs2_t,rs1_t,rd_t);
+               end
+               riscv::SRL_SRA:begin;
+                  case(instruction.rtype.funct7)
+                     riscv::ADD_SRL_func:begin;
+                        riscv::print_r("srl",rs2_t,rs1_t,rd_t);
+                     end
+                     riscv::SUB_SRA_func:begin;
+                        riscv::print_r("sra",rs2_t,rs1_t,rd_t);
+                     end
+                     default:$display("Illegal srl/sra?\n");
+                  endcase
+               end
+               riscv::OR:begin;
+                  riscv::print_r("or",rs2_t,rs1_t,rd_t);
+               end
+               riscv::AND:begin;
+                  riscv::print_r("and",rs2_t,rs1_t,rd_t);
+               end
+
+               default: $display("Illegal Rformat?\n"); 
+
+            endcase
+         end
          riscv::E_OP: begin; end
          default: $display("Illegal Instruction!\n");
       endcase

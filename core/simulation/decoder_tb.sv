@@ -13,32 +13,42 @@ module decoder_tb;
 	core::ALU_OP_t alu_op;
 	always# (`CLK_PERIOD) clk = ~clk;
 	riscv::reg_t register;	
-		
-	decoder d(.clk(clk),.rst(rst),.instruction_i(instruction_o),.rs1_o(rs1_o),.rs2_o(rs2_o),.rd_o(rd_o),.alu_op_o(alu_op));
+	logic [31:0] immediate ;
+	id_stage id(.clk(clk),.rst(rst),.instruction_i(instruction_o),.rs1_o(rs1_o),.rs2_o(rs2_o),.rd_o(rd_o),.alu_op_o(alu_op),.immediate_o(immediate));
 	initial begin
 		
 		@(posedge clk);
 		@(posedge clk);
 
-		instruction_o = riscv::addi(riscv::x0,riscv::x0,0);
+		instruction_o = riscv::xori(riscv::x0,riscv::x0,-15);
 		@(posedge clk);
-
+		instruction_o = riscv::andi(riscv::x1,riscv::x5,5);
 		$display("ALU_OP : %s",alu_op.name);
-		instruction_o = riscv::store(riscv::x1,riscv::x5,1,2,riscv::HWORD);
 		@(posedge clk);
-		instruction_o = riscv::store(riscv::x1,riscv::x6,1,2,riscv::BYTE);
+		
+		instruction_o = riscv::store_num(riscv::x1,riscv::x5,-10,riscv::HWORD);
 		@(posedge clk);
-		instruction_o = riscv::store(riscv::x1,riscv::x7,1,2,riscv::WORD);
+		instruction_o = riscv::store_num(riscv::x1,riscv::x5,20,riscv::HWORD);
 		@(posedge clk);
-		instruction_o = riscv::load(15,riscv::x1,riscv::x8,riscv::BYTE,riscv::UNSIGNED);
+		
+		instruction_o = riscv::store_num(riscv::x1,riscv::x5,-20,riscv::HWORD);
+
 		@(posedge clk);
-		instruction_o = riscv::load(15,riscv::x1,riscv::x9,riscv::HWORD,riscv::UNSIGNED);
+		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::ADD_SUB,riscv::x3,0);
 		@(posedge clk);
-		instruction_o = riscv::load(15,riscv::x1,riscv::x8,riscv::WORD,riscv::SIGNED);
+		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::SLL,riscv::x3,0);
 		@(posedge clk);
-		instruction_o = riscv::load(15,riscv::x1,riscv::x9,riscv::BYTE,riscv::SIGNED);
+		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::SLT,riscv::x3,0);
 		@(posedge clk);
-		instruction_o = riscv::load(15,riscv::x1,riscv::x9,riscv::HWORD,riscv::SIGNED);
+		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::SLTU,riscv::x3,0);
+		@(posedge clk);
+		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::XOR,riscv::x3,0);
+		@(posedge clk);
+		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::SRL_SRA,riscv::x3,0);
+		@(posedge clk);
+		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::OR,riscv::x3,0);
+		@(posedge clk);
+		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::AND,riscv::x3,0);
 		@(posedge clk);
 		$finish;
     end
