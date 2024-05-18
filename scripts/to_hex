@@ -1,0 +1,14 @@
+#! /bin/bash
+
+source /eda/cs523/2024s/riscv/code/rv32i-settings.sh
+
+echo "producing hex file from File :$1"
+
+riscv32-unknown-elf-as $1 -o "$1.out"
+riscv32-unknown-elf-objcopy -O binary "$1.out" "$1.bin" --strip-debug
+rm "$1.out"
+od -t x4 -An -w4 -v "$1.bin" >> "$1.hex" 
+cat $1.hex 
+mv $1.hex ../code/ihex
+
+echo done

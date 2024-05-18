@@ -1,57 +1,64 @@
 `define CLK_PERIOD 5
 
 
-module decoder_tb;
+module decoder_tb(
+	input logic clk,
+	input logic rst,
+	input [31:0] instruction_i
+);
 	import core::*;
 	import riscv::*;
-	logic clk=1;
-	logic rst=0;
 	logic [4:0] rs1_o;
 	logic [4:0] rs2_o;
 	logic [4:0] rd_o;
-	logic [31:0] instruction_o;
+	logic [31:0] instruction_gen;
 	core::ALU_OP_t alu_op;
-	always# (`CLK_PERIOD) clk = ~clk;
 	riscv::reg_t register;	
 	logic [31:0] immediate ;
-	id_stage id(.clk(clk),.rst(rst),.instruction_i(instruction_o),.rs1_o(rs1_o),.rs2_o(rs2_o),.rd_o(rd_o),.alu_op_o(alu_op),.immediate_o(immediate));
+	//id_stage id(.clk(clk),.rst(rst),.instruction_i(instruction_i),.rs1_o(rs1_o),.rs2_o(rs2_o),.rd_o(rd_o),.alu_op_o(alu_op),.immediate_o(immediate));
 	initial begin
 		
 		@(posedge clk);
 		@(posedge clk);
 
-		instruction_o = riscv::xori(riscv::x0,riscv::x0,-15);
 		@(posedge clk);
-		instruction_o = riscv::andi(riscv::x1,riscv::x5,5);
+
+	$finish;
+    end
+
+
+	task generate_instrs();
+		instruction_gen = riscv::xori(riscv::x0,riscv::x0,-15);
+		@(posedge clk);
+		instruction_gen = riscv::andi(riscv::x1,riscv::x5,5);
 		$display("ALU_OP : %s",alu_op.name);
 		@(posedge clk);
 		
-		instruction_o = riscv::store_num(riscv::x1,riscv::x5,-10,riscv::HWORD);
+		instruction_gen = riscv::store_num(riscv::x1,riscv::x5,-10,riscv::HWORD);
 		@(posedge clk);
-		instruction_o = riscv::store_num(riscv::x1,riscv::x5,20,riscv::HWORD);
+		instruction_gen = riscv::store_num(riscv::x1,riscv::x5,20,riscv::HWORD);
 		@(posedge clk);
 		
-		instruction_o = riscv::store_num(riscv::x1,riscv::x5,-20,riscv::HWORD);
+		instruction_gen = riscv::store_num(riscv::x1,riscv::x5,-20,riscv::HWORD);
 
 		@(posedge clk);
-		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::ADD_SUB,riscv::x3,0);
+		instruction_gen = riscv::gen_rr(riscv::x1,riscv::x2,riscv::ADD_SUB,riscv::x3,0);
 		@(posedge clk);
-		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::SLL,riscv::x3,0);
+		instruction_gen = riscv::gen_rr(riscv::x1,riscv::x2,riscv::SLL,riscv::x3,0);
 		@(posedge clk);
-		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::SLT,riscv::x3,0);
+		instruction_gen = riscv::gen_rr(riscv::x1,riscv::x2,riscv::SLT,riscv::x3,0);
 		@(posedge clk);
-		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::SLTU,riscv::x3,0);
+		instruction_gen = riscv::gen_rr(riscv::x1,riscv::x2,riscv::SLTU,riscv::x3,0);
 		@(posedge clk);
-		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::XOR,riscv::x3,0);
+		instruction_gen = riscv::gen_rr(riscv::x1,riscv::x2,riscv::XOR,riscv::x3,0);
 		@(posedge clk);
-		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::SRL_SRA,riscv::x3,0);
+		instruction_gen = riscv::gen_rr(riscv::x1,riscv::x2,riscv::SRL_SRA,riscv::x3,0);
 		@(posedge clk);
-		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::OR,riscv::x3,0);
+		instruction_gen = riscv::gen_rr(riscv::x1,riscv::x2,riscv::OR,riscv::x3,0);
 		@(posedge clk);
-		instruction_o = riscv::gen_rr(riscv::x1,riscv::x2,riscv::AND,riscv::x3,0);
-		@(posedge clk);
-		$finish;
-    end
+		instruction_gen = riscv::gen_rr(riscv::x1,riscv::x2,riscv::AND,riscv::x3,0);
+		@(posedge clk);	
+	endtask
 
 	task display_instr(logic [31:0] ins);
 		riscv::instruction_t instruction ; 

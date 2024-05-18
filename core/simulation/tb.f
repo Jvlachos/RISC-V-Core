@@ -3,4 +3,6 @@
 ../synthesis/decoder.sv
 ../synthesis/imm_gen.sv
 ../synthesis/id_stage.sv
+../synthesis/mem_sync_sp.sv
+../synthesis/if_stage.sv
 

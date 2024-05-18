@@ -5,12 +5,15 @@ module decoder
    input logic clk,
    input logic rst, 
    input logic [31:0] instruction_i,
-   output logic [4:0] rs1_o,
-   output logic [4:0] rs2_o,
-   output logic [4:0] rd_o,
-   output core::ALU_OP_t alu_op_o,
-   output logic [2:0] format_o
+   input  logic [31:0] pc_i,
+   output core::pipeline_bus_t id_bus_o
 );
+   logic [2:0] format;
+   imm_generator im_gen(
+        .instr_i(instruction_i),
+        .format_i(format),
+        .imm_o(id_bus_o.imm));
+
    riscv::instruction_t instruction;
    assign instruction = riscv::instruction_t'(instruction_i); 
    riscv::reg_t rs1_t;
@@ -18,56 +21,69 @@ module decoder
    riscv::reg_t rd_t;
    
    always_comb begin : instr_decoder
-      format_o = core::NOP;
+      format = core::NOP;
+      id_bus_o.mem_op = core::MEM_NOP;
+      id_bus_o.alu_op = core::ALU_NOP;
+      id_bus_o.format = core::NOP;
+      id_bus_o.instr  = instruction_i; 
+      id_bus_o.rs1    = 'bx;
+      id_bus_o.rs2    = 'bx;
+      id_bus_o.rd     = 'bx;
+      id_bus_o.pc     = pc_i;
+
        case (instruction.instruction[6:0])
          riscv::I_OP: begin
-            rs1_o = instruction.itype.rs1;
-            rd_o  = instruction.itype.rd;
-            rs1_t = riscv::reg_t'(rs1_o);
-            rd_t  = riscv::reg_t'(rd_o);
-            format_o = core::I_FORMAT;
+            rs1_t = riscv::reg_t'(instruction.itype.rs1);
+            rd_t  = riscv::reg_t'(instruction.itype.rd);
+            format = core::I_FORMAT;
+
+            //bus
+            id_bus_o.format = core::I_FORMAT;
+            id_bus_o.rs1    = instruction.itype.rs1;
+            id_bus_o.rd     = instruction.itype.rd;
+
             unique case (instruction.itype.funct3)
                riscv::ADDI_F3: begin  
-                  if(rs1_o == 5'b0 && rd_o == 5'b0 && instruction.itype.imm ==0 )
+                  if(instruction.itype.rs1 == 5'b0 &&  instruction.itype.rd == 5'b0 && instruction.itype.imm ==0 )
                      $display("NOP\n");
                   else begin;
-                     alu_op_o = core::ALU_ADD;
+                     id_bus_o.alu_op = core::ALU_ADD;
                      $display("addi %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                   end
                end
                riscv::SLTI_F3: begin
-                  alu_op_o = core::ALU_SLT;
-                  $display("slti %s,%s,%d\n",rd_t.name(),rs1_t.name(),instruction.itype.imm);
+                  id_bus_o.alu_op = core::ALU_SLT;
+                  $display("slti %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                end
                riscv::SLTIU_F3:  begin
-                  alu_op_o = core::ALU_SLT;
-                  $display("sltiu %s,%s,%d\n",rd_t.name(),rs1_t.name(),instruction.itype.imm);
+                  id_bus_o.alu_op = core::ALU_SLTU;
+                  $display("sltiu %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                end
                riscv::XORI_F3: begin 
-                  alu_op_o = core::ALU_XOR;
-                  $display("xori %s,%s,%d\n",rd_t.name(),rs1_t.name(),instruction.itype.imm);
+                  id_bus_o.alu_op = core::ALU_XOR;
+                  $display("xori %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                end
                riscv::ORI_F3: begin   
-                  alu_op_o = core::ALU_OR;
-                  $display("ori %s,%s,%d\n",rd_t.name(),rs1_t.name(),instruction.itype.imm);
+                  id_bus_o.alu_op = core::ALU_OR;
+                  $display("ori %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                end
                riscv::ANDI_F3:  begin
-                  alu_op_o = core::ALU_AND; 
-                  $display("andi %s,%s,%d\n",rd_t.name(),rs1_t.name(),instruction.itype.imm);
+                  id_bus_o.alu_op = core::ALU_AND;
+                  $display("andi %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                end
                riscv::SLLI_F3: begin
-                  alu_op_o = core::ALU_SLL;
-                  $display("slli %s,%s,%d\n",rd_t.name(),rs1_t.name(),instruction.itype.imm);
+                  id_bus_o.alu_op = core::ALU_SLL;
+                  $display("slli %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                end
 
                riscv::SRLI_SRAI: begin 
                   case(instruction.instruction[31:25])
                      riscv::SRAI_func :begin
-                        alu_op_o = core::ALU_SRA;
-                        $display("srai %s,%s,%d\n",rd_t.name(),rs1_t.name(),instruction.itype.imm);
+                        id_bus_o.alu_op = core::ALU_SRA;
+                        $display("srai %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                      end
                      riscv::SRLI_func :begin 
-                        alu_op_o = core::ALU_SRL;
+                        id_bus_o.alu_op = core::ALU_SRL;
                         $display("srli %s,%s,%d\n",rd_t.name(),rs1_t.name(),instruction.itype.imm);
                      end
                      default: $display("Illegal srli_srai fun\n");
@@ -78,11 +94,9 @@ module decoder
           end
 
          riscv::S_OP: begin 
-            format_o = core::S_FORMAT;
-            rs1_o = instruction.stype.rs1;
-            rs2_o  = instruction.stype.rs2;
-            rs1_t = riscv::reg_t'(rs1_o);
-            rs2_t  = riscv::reg_t'(rs2_o);
+            format = core::S_FORMAT;
+            rs1_t = riscv::reg_t'(instruction.stype.rs1);
+            rs2_t  = riscv::reg_t'(instruction.stype.rs2);
             case(instruction.stype.funct3)
               
                {riscv::SIGNED, riscv::BYTE}:$display("sb %s,%0d(%s)\n", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
@@ -92,10 +106,8 @@ module decoder
             endcase
           end          
          riscv::L_OP: begin 
-            rs1_o = instruction.itype.rs1;
-            rd_o  = instruction.itype.rd;
-            rs1_t = riscv::reg_t'(rs1_o);
-            rd_t  = riscv::reg_t'(rd_o);
+            rs1_t = riscv::reg_t'(instruction.itype.rs1);
+            rd_t  = riscv::reg_t'(instruction.itype.rd);
             case(instruction.itype.funct3)
                {riscv::SIGNED,riscv::BYTE}:$display("lb %s,%0d(%s)\n", rd_t.name, instruction.itype.imm, rs1_t.name);
                {riscv::SIGNED,riscv::HWORD}:$display("lh %s,%0d(%s)\n", rd_t.name, instruction.itype.imm, rs1_t.name);
@@ -112,13 +124,10 @@ module decoder
          riscv::JALR_OP: begin; end
          riscv::B_OP: begin; end
          riscv::RR_OP: begin;
-            format_o = core::R_FORMAT;
-            rs1_o = instruction.rtype.rs1;
-            rs2_o = instruction.rtype.rs2;
-            rd_o  = instruction.rtype.rd;
-            rs1_t = riscv::reg_t'(rs1_o);
-            rd_t  = riscv::reg_t'(rd_o);
-            rs2_t  = riscv::reg_t'(rs2_o);
+            format = core::R_FORMAT;
+            rs1_t = riscv::reg_t'(instruction.rtype.rs1);
+            rd_t  = riscv::reg_t'(instruction.rtype.rs2);
+            rs2_t  = riscv::reg_t'(instruction.rtype.rd);
             unique case(instruction.rtype.funct3) 
                riscv::ADD_SUB: begin;
                   case(instruction.rtype.funct7)

@@ -1,21 +1,22 @@
 package core;
  
-    typedef enum logic [3:0] 
+    typedef enum logic [4:0] 
     {
-        ALU_ADD = 4'b0000,
-        ALU_SUB,
-        ALU_AND,
-        ALU_OR,
-        ALU_XOR,
-        ALU_SLL,
-        ALU_SLT,
-        ALU_SLTU,
-        ALU_SRL,
-        ALU_SRA,
-        ALU_LUI,
-        ALU_AUIPC,
-        ALU_BGE,
-        ALU_BLT   
+        ALU_ADD = 5'b00000,
+        ALU_SUB = 5'b00001,
+        ALU_AND = 5'b00010,
+        ALU_OR  = 5'b00011,
+        ALU_XOR = 5'b00100,
+        ALU_SLL = 5'b00101,
+        ALU_SLT = 5'b00110,
+        ALU_SLTU= 5'b00111,
+        ALU_SRL = 5'b01000,
+        ALU_SRA = 5'b01001,
+        ALU_LUI = 5'b01010,
+        ALU_AUIPC= 5'b01011,
+        ALU_BGE = 5'b01100,
+        ALU_BLT = 5'b01101,
+        ALU_NOP = 5'b10000  
     } ALU_OP_t;
 
     typedef enum logic [2:0]{
@@ -26,15 +27,16 @@ package core;
         NOP      = 3'b100
     } formats_t ;
 
-    typedef enum logic [2:0]{
-        LB = 3'b000,
-        LH = 3'b001,
-        LW = 3'b010,
-        LBU= 3'b011,
-        LHU= 3'b100,
-        SB = 3'b101,
-        SH = 3'b110,
-        SW = 3'b111
+    typedef enum logic [3:0]{
+        LB = 4'b0000,
+        LH = 4'b0001,
+        LW = 4'b0010,
+        LBU= 4'b0011,
+        LHU= 4'b0100,
+        SB = 4'b0101,
+        SH = 4'b0110,
+        SW = 4'b0111,
+        MEM_NOP= 4'b1000
     } MEM_OP_t;
 
 
@@ -48,7 +50,12 @@ package core;
         logic [4:0] rs2;
         logic [4:0] rd;
         logic [31:0] pc;
-
     } pipeline_bus_t;
+    
+    localparam DEPTH = 2048 ;
+    localparam ADDR_WIDTH = $clog2(DEPTH);
+    localparam DATA_WIDTH =32;
+    localparam DATA_BYTES = DATA_WIDTH/8;
+
 
 endpackage
