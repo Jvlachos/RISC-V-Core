@@ -5,4 +5,6 @@
 ../synthesis/id_stage.sv
 ../synthesis/mem_sync_sp.sv
 ../synthesis/if_stage.sv
-
+../synthesis/regfile_2r1w.sv
+../synthesis/ex_stage.sv
+../synthesis/alu.sv

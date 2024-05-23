@@ -1,5 +1,5 @@
 package core;
- 
+    
     typedef enum logic [4:0] 
     {
         ALU_ADD = 5'b00000,
@@ -16,6 +16,7 @@ package core;
         ALU_AUIPC= 5'b01011,
         ALU_BGE = 5'b01100,
         ALU_BLT = 5'b01101,
+        ALU_BEQ = 5'b01110,
         ALU_NOP = 5'b10000  
     } ALU_OP_t;
 
@@ -43,19 +44,27 @@ package core;
     typedef struct packed {
         MEM_OP_t mem_op;
         ALU_OP_t alu_op;
+        bit is_branch;
         formats_t format;
         logic [31:0] instr;
         logic [31:0] imm;
         logic [4:0] rs1;
         logic [4:0] rs2;
         logic [4:0] rd;
+        logic [31:0] rd_res;
+        logic [31:0] rs1_data;
+        logic [31:0] rs2_data;
         logic [31:0] pc;
     } pipeline_bus_t;
     
-    localparam DEPTH = 2048 ;
+
+
+
+    localparam DEPTH = 4096 ;
     localparam ADDR_WIDTH = $clog2(DEPTH);
     localparam DATA_WIDTH =32;
     localparam DATA_BYTES = DATA_WIDTH/8;
+
 
 
 endpackage

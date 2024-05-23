@@ -1,4 +1,4 @@
-`define CLK_PERIOD 5
+`define CLK_PERIOD 10
 
 module core_top;
     import core::*;
@@ -12,7 +12,10 @@ module core_top;
     logic [31:0] pc;
 
     always# (`CLK_PERIOD) clk = ~clk;
-    core::pipeline_bus_t bus;
+    core::pipeline_bus_t id_bus;
+    core::pipeline_bus_t ex_bus;
+   
+    int cycle_no = 0;
 
     if_stage if_s(
     .clk(clk),
@@ -29,14 +32,43 @@ module core_top;
         .rst(rst),
         .instruction_i(instruction),
         .pc_i(pc),
-        .id_bus_o(bus));
+        .id_bus_o(id_bus));
+
+    ex_stage ex_s(
+        .clk(clk),
+        .rst(rst),
+        .bus_i(id_bus),
+        .ex_bus_o(ex_bus)
+    );
+    
 
     initial begin
         @(posedge clk);
+    
         rst = 1;
-        @(posedge clk);
-
+        repeat(10) begin
+            pc_incr = 1;
+            #5;
+            @(posedge clk);
+            cycle_no ++;
+            pc_incr = 0;
+            #5;
+            display_bus(id_bus,"ID");
+            display_bus(ex_bus,"EX");
+            $display("\n ---------------------------------------------------- \n");
+            #5;
+        end
         $finish;
     end
+
+    task display_bus(pipeline_bus_t curr_bus,string msg);
+        $display("Cycle : %d Stage : %s\n",cycle_no,msg);
+        riscv::decode_instr(curr_bus.instr);
+        $display("\nMemOp: %s\nAluOp: %s\nFormat: %s\nImm: %d\nRs1: %d\nRs2: %d\nRd: %d\nPc: 0x%h\nRs1 data: 0x%h\nRs2 data: 0x%h\nRd data: 0x%d\n",
+        curr_bus.mem_op.name(),curr_bus.alu_op.name(),
+        curr_bus.format.name(),$signed(curr_bus.imm),curr_bus.rs1,curr_bus.rs2,curr_bus.rd,curr_bus.pc,
+        curr_bus.rs1_data,curr_bus.rs2_data,$signed(curr_bus.rd_res));
+    endtask
+
 
 endmodule

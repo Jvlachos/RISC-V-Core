@@ -26,7 +26,7 @@ always @(posedge clk) begin
       mem[i_addr][8*i +: 8] = i_wdata[8*i +: 8];
     end
   end
-
+  //$display("IN MEM ADDR : 0x%h\n MEM CONT : 0x%h\n",i_addr,mem[i_addr]);
   o_rdata = mem[i_addr];
 end
 

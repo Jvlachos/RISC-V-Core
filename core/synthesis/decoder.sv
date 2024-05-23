@@ -14,6 +14,17 @@ module decoder
         .format_i(format),
         .imm_o(id_bus_o.imm));
 
+   regfile_2r1w rf(
+      .clk(clk),
+      .i_raddr_a(id_bus_o.rs1),
+      .i_raddr_b(id_bus_o.rs2),
+      .i_wen(0),
+      .i_waddr(0),
+      .i_wdata(0),
+      .o_rdata_a(id_bus_o.rs1_data),
+      .o_rdata_b(id_bus_o.rs2_data)
+   );
+
    riscv::instruction_t instruction;
    assign instruction = riscv::instruction_t'(instruction_i); 
    riscv::reg_t rs1_t;
@@ -21,15 +32,18 @@ module decoder
    riscv::reg_t rd_t;
    
    always_comb begin : instr_decoder
-      format = core::NOP;
-      id_bus_o.mem_op = core::MEM_NOP;
-      id_bus_o.alu_op = core::ALU_NOP;
-      id_bus_o.format = core::NOP;
-      id_bus_o.instr  = instruction_i; 
-      id_bus_o.rs1    = 'bx;
-      id_bus_o.rs2    = 'bx;
-      id_bus_o.rd     = 'bx;
-      id_bus_o.pc     = pc_i;
+      format               =  core::NOP;
+      id_bus_o.mem_op      =  core::MEM_NOP;
+      id_bus_o.alu_op      =  core::ALU_NOP;
+      id_bus_o.format      =  core::NOP;
+      id_bus_o.instr       =  instruction_i; 
+      id_bus_o.rs1         =  'b0;
+      id_bus_o.rs2         =  'b0;
+      id_bus_o.rd          =  'b0;
+      id_bus_o.is_branch   = 1'b0;
+      id_bus_o.rd_res      =  'b0;
+      id_bus_o.pc          =  pc_i;
+      //instr_str_o          =  " ";
 
        case (instruction.instruction[6:0])
          riscv::I_OP: begin
@@ -48,7 +62,7 @@ module decoder
                      $display("NOP\n");
                   else begin;
                      id_bus_o.alu_op = core::ALU_ADD;
-                     $display("addi %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+                     //instr_str_o = riscv::get_instr_str("addi",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                   end
                end
                riscv::SLTI_F3: begin
@@ -97,23 +111,54 @@ module decoder
             format = core::S_FORMAT;
             rs1_t = riscv::reg_t'(instruction.stype.rs1);
             rs2_t  = riscv::reg_t'(instruction.stype.rs2);
+            id_bus_o.rs1 = instruction.stype.rs1;
+            id_bus_o.rs2 = instruction.stype.rs2;
+            id_bus_o.format = core::S_FORMAT;
+
             case(instruction.stype.funct3)
               
-               {riscv::SIGNED, riscv::BYTE}:$display("sb %s,%0d(%s)\n", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
-               {riscv::SIGNED, riscv::HWORD}:$display("sh %s,%0d(%s)\n", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
-               {riscv::SIGNED, riscv::WORD}:$display("sw %s,%0d(%s)\n", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
+               {riscv::SIGNED, riscv::BYTE}: begin 
+                  id_bus_o.mem_op = core::SB;
+                  //instr_str_o = riscv::get_instr_str("sb", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}),{"(",rs1_t.name,")"});
+               end
+               {riscv::SIGNED, riscv::HWORD}:begin
+                  id_bus_o.mem_op = core::SH;
+                  //instr_str_o = riscv::get_instr_str("sh", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}),{"(",rs1_t.name,")"});
+               end
+               {riscv::SIGNED, riscv::WORD}: begin 
+                  id_bus_o.mem_op = core::SW;
+                  //instr_str_o = riscv::get_instr_str("sw", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}),{"(",rs1_t.name,")"});
+               end
                default:$display("Illegal store?\n");
             endcase
           end          
          riscv::L_OP: begin 
             rs1_t = riscv::reg_t'(instruction.itype.rs1);
             rd_t  = riscv::reg_t'(instruction.itype.rd);
+            id_bus_o.rs1 = instruction.itype.rs1;
+            id_bus_o.rd  = instruction.itype.rd;
+            id_bus_o.format = core::I_FORMAT;
             case(instruction.itype.funct3)
-               {riscv::SIGNED,riscv::BYTE}:$display("lb %s,%0d(%s)\n", rd_t.name, instruction.itype.imm, rs1_t.name);
-               {riscv::SIGNED,riscv::HWORD}:$display("lh %s,%0d(%s)\n", rd_t.name, instruction.itype.imm, rs1_t.name);
-               {riscv::SIGNED,riscv::WORD}:$display("lw %s,%0d(%s)\n", rd_t.name, instruction.itype.imm, rs1_t.name);
-               {riscv::UNSIGNED,riscv::BYTE}:$display("lbu %s,%0d(%s)\n", rd_t.name, instruction.itype.imm, rs1_t.name);
-               {riscv::UNSIGNED,riscv::HWORD}:$display("lhu %s,%0d(%s)\n", rd_t.name, instruction.itype.imm, rs1_t.name);
+               {riscv::SIGNED,riscv::BYTE}:begin
+                   id_bus_o.mem_op = core::LB;
+                  //instr_str_o = riscv::get_instr_str("lb", rd_t.name, instruction.itype.imm, {"(",rs1_t.name,")"});
+               end
+               {riscv::SIGNED,riscv::HWORD}:begin 
+                  id_bus_o.mem_op = core::LH;
+                  //instr_str_o = riscv::get_instr_str("lh", rd_t.name, instruction.itype.imm, {"(",rs1_t.name,")"});
+               end
+               {riscv::SIGNED,riscv::WORD}:begin 
+                  id_bus_o.mem_op = core::LW;
+                  //instr_str_o = riscv::get_instr_str("lw", rd_t.name, instruction.itype.imm, {"(",rs1_t.name,")"});
+               end
+               {riscv::UNSIGNED,riscv::BYTE}:begin 
+                  id_bus_o.mem_op = core::LBU;
+                  //instr_str_o = riscv::get_instr_str("lbu", rd_t.name, instruction.itype.imm, {"(",rs1_t.name,")"});
+               end
+               {riscv::UNSIGNED,riscv::HWORD}:begin 
+                  id_bus_o.mem_op = core::LHU;
+                  //instr_str_o = riscv::get_instr_str("lhu", rd_t.name, instruction.itype.imm, {"(",rs1_t.name,")"});
+               end
 
                default:$display("Illegal load?\n");            
             endcase
@@ -128,47 +173,61 @@ module decoder
             rs1_t = riscv::reg_t'(instruction.rtype.rs1);
             rd_t  = riscv::reg_t'(instruction.rtype.rs2);
             rs2_t  = riscv::reg_t'(instruction.rtype.rd);
+            id_bus_o.rs1 = instruction.rtype.rs1;
+            id_bus_o.rd= instruction.rtype.rd;
+            id_bus_o.rs2 = instruction.rtype.rs2;
+            id_bus_o.format = core::R_FORMAT;
             unique case(instruction.rtype.funct3) 
                riscv::ADD_SUB: begin;
                   case(instruction.rtype.funct7)
                      riscv::ADD_SRL_func:begin;
-                        riscv::print_r("add",rs2_t,rs1_t,rd_t);
+                        id_bus_o.alu_op = core::ALU_ADD;
+                        //instr_str_o = riscv::get_rr_str("add",rs2_t,rs1_t,rd_t);
                      end
 
                      riscv::SUB_SRA_func:begin;
-                        riscv::print_r("sub",rs2_t,rs1_t,rd_t);
+                        id_bus_o.alu_op = core::ALU_SUB;
+                        //instr_str_o = riscv::get_rr_str("sub",rs2_t,rs1_t,rd_t);
                      end
 
                     default:$display("Illegal add/sub?\n");
                   endcase
                end
                riscv::SLL:begin;
+                  id_bus_o.alu_op = core::ALU_SLL;
                   riscv::print_r("sll",rs2_t,rs1_t,rd_t);
                end
                riscv::SLT:begin;
+                  id_bus_o.alu_op = core::ALU_SLT;
                   riscv::print_r("slt",rs2_t,rs1_t,rd_t);
                end
                riscv::SLTU:begin;
+                  id_bus_o.alu_op = core::ALU_SLTU;
                   riscv::print_r("sltu",rs2_t,rs1_t,rd_t);
                end
                riscv::XOR:begin;
+                  id_bus_o.alu_op = core::ALU_XOR;
                   riscv::print_r("xor",rs2_t,rs1_t,rd_t);
                end
                riscv::SRL_SRA:begin;
                   case(instruction.rtype.funct7)
                      riscv::ADD_SRL_func:begin;
+                        id_bus_o.alu_op = core::ALU_SRL;
                         riscv::print_r("srl",rs2_t,rs1_t,rd_t);
                      end
                      riscv::SUB_SRA_func:begin;
+                        id_bus_o.alu_op = core::ALU_SRA;
                         riscv::print_r("sra",rs2_t,rs1_t,rd_t);
                      end
                      default:$display("Illegal srl/sra?\n");
                   endcase
                end
                riscv::OR:begin;
+                  id_bus_o.alu_op = core::ALU_OR;
                   riscv::print_r("or",rs2_t,rs1_t,rd_t);
                end
                riscv::AND:begin;
+                  id_bus_o.alu_op = core::ALU_AND;
                   riscv::print_r("and",rs2_t,rs1_t,rd_t);
                end
 
