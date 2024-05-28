@@ -1,4 +1,6 @@
-`define CLK_PERIOD 10
+
+`define CLK_PERIOD 20
+
 
 module core_top;
     import core::*;

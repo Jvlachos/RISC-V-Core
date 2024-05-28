@@ -87,7 +87,7 @@ module decoder
                end
                riscv::SLLI_F3: begin
                   id_bus_o.alu_op = core::ALU_SLL;
-                  $display("slli %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+                  $display("slli %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm)); //we don't want the whole imm
                end
 
                riscv::SRLI_SRAI: begin 

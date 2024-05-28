@@ -10,6 +10,7 @@ module if_stage
     output logic [31:0] pc_o
 );
 
+    logic [31:0] pc;
     mem_sync_sp 
     #(.INIT_FILE("/home/dvlachos/project/RISC-V-Core/code/ihex/code.hex"),
       .ADDR_WIDTH(core::ADDR_WIDTH),
@@ -18,13 +19,12 @@ module if_stage
       .DATA_BYTES(core::DATA_BYTES))
     i_mem (
     .clk(clk),
-    .i_addr(pc_o[core::ADDR_WIDTH+1:2]),
+    .i_addr(pc[core::ADDR_WIDTH+1:2]),
     .i_wdata(wdata_i),
     .i_wen(wen_i),
     .o_rdata(instr_o));
 
 
-    logic [31:0] pc;
     always_comb begin  
         pc = 'h100;
 

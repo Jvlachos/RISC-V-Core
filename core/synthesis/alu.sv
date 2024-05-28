@@ -1,5 +1,6 @@
 module alu
     import core::*;
+    import riscv::*;
 (
     input logic clk,
     input core::pipeline_bus_t alu_bus_i,
@@ -8,6 +9,7 @@ module alu
 
     always_comb begin : arithmetic_unit
         assign alu_bus_o = alu_bus_i;
+        
 
         if(~alu_bus_i.is_branch) begin
             unique case(alu_bus_i.alu_op) 
@@ -62,10 +64,10 @@ module alu
                 core::ALU_SLL: begin
                     unique case(alu_bus_i.format)
                         core::I_FORMAT: begin
-                            
+                            alu_bus_o.rd_res = alu_bus_i.rs1_data << alu_bus_i.imm;          
                         end
                         core::R_FORMAT: begin
-                        
+                            alu_bus_o.rd_res = alu_bus_i.rs1_data << alu_bus_i.rs2_data;
                         end
                     endcase
                 end
@@ -73,10 +75,10 @@ module alu
                 core::ALU_SLT: begin
                     unique case(alu_bus_i.format)
                         core::I_FORMAT: begin
-
+                            alu_bus_o.rd_res = $signed(alu_bus_i.rs1_data) < $signed(alu_bus_i.imm); 
                         end
                         core::R_FORMAT: begin
-                        
+                            alu_bus_o.rd_res = $signed(alu_bus_i.rs1_data) < $signed(alu_bus_i.rs2_data);
                         end
                     endcase
                 end
@@ -84,10 +86,10 @@ module alu
                 core::ALU_SLTU: begin
                     unique case(alu_bus_i.format)
                         core::I_FORMAT:begin
-
+                            alu_bus_o.rd_res = alu_bus_i.rs1_data < alu_bus_i.imm; 
                         end
                         core::R_FORMAT: begin
-                        
+                            alu_bus_o.rd_res = alu_bus_i.rs1_data < alu_bus_i.rs2_data; 
                         end
                     endcase                    
                 end
@@ -95,10 +97,10 @@ module alu
                 core::ALU_SRL :begin
                     unique case(alu_bus_i.format)
                         core::I_FORMAT: begin
-
+                            alu_bus_o.rd_res = alu_bus_i.rs1_data >> alu_bus_i.imm;          
                         end
                         core::R_FORMAT: begin
-                        
+                            alu_bus_o.rd_res = alu_bus_i.rs1_data >> alu_bus_i.rs2_data;
                         end
                     endcase                    
                 end
@@ -106,34 +108,20 @@ module alu
                 core::ALU_SRA :begin
                     unique case(alu_bus_i.format)
                         core::I_FORMAT :begin
-
+                            alu_bus_o.rd_res = alu_bus_i.rs1_data >>> alu_bus_i.imm;          
                         end
                         core::R_FORMAT :begin
-                        
+                            alu_bus_o.rd_res = alu_bus_i.rs1_data >>> alu_bus_i.rs2_data;
                         end
                     endcase                    
                 end
 
                 core::ALU_LUI :begin
-                    unique case(alu_bus_i.format)
-                        core::I_FORMAT :begin
-
-                        end
-                        core::R_FORMAT :begin
-                        
-                        end
-                    endcase                    
+                    alu_bus_o.rd_res = $signed(alu_bus_i.imm);
                 end
 
                 core::ALU_AUIPC :begin
-                    unique case(alu_bus_i.format)
-                        core::I_FORMAT :begin
-
-                        end
-                        core::R_FORMAT :begin
-                        
-                        end
-                    endcase                    
+                    alu_bus_o.rd_res = $signed(alu_bus_i.imm) + alu_bus_i.pc;                   
                 end
                 core::ALU_NOP: begin
                 end
