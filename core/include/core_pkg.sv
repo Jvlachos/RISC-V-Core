@@ -1,23 +1,35 @@
 package core;
     
+    typedef enum  logic [1:0] { 
+        BRANCH_PRFX = 2'b00,
+        ARITHM_PRFX = 2'b01
+    } alu_prefix_t;
+
+    typedef enum  logic {
+        LOAD_PRFX  = 1'b0,
+        STORE_PRFX = 1'b1
+    } mem_prefix_t;
+
     typedef enum logic [4:0] 
     {
-        ALU_ADD = 5'b00000,
-        ALU_SUB = 5'b00001,
-        ALU_AND = 5'b00010,
-        ALU_OR  = 5'b00011,
-        ALU_XOR = 5'b00100,
-        ALU_SLL = 5'b00101,
-        ALU_SLT = 5'b00110,
-        ALU_SLTU= 5'b00111,
-        ALU_SRL = 5'b01000,
-        ALU_SRA = 5'b01001,
-        ALU_LUI = 5'b01010,
-        ALU_AUIPC= 5'b01011,
-        ALU_BGE = 5'b01100,
-        ALU_BLT = 5'b01101,
-        ALU_BEQ = 5'b01110,
-        ALU_NOP = 5'b10000  
+        ALU_BEQ         = 5'b00000,
+        ALU_BNE         = 5'b00001,
+        ALU_LUI         = 5'b00010,
+        //ALU_SRL        = 5'b00011,
+        ALU_BLT         = 5'b00100,
+        ALU_BGE         = 5'b00101,
+        ALU_BLTU        = 5'b00110,
+        ALU_BGEU        = 5'b00111,
+        ALU_ADD         = 5'b01000, //BEQ 1 000
+        ALU_SLL         = 5'b01001, // BNE 1 001
+        ALU_SLT         = 5'b01010,
+        ALU_SLTU        = 5'b01011,
+        ALU_XOR         = 5'b01100,
+        ALU_SRA_SRL     = 5'b01101,
+        ALU_OR          = 5'b01110,
+        ALU_AND         = 5'b01111,
+        ALU_AUIPC       = 5'b10000,
+        ALU_NOP         = 5'b10010  
     } ALU_OP_t;
 
     typedef enum logic [2:0]{
@@ -25,19 +37,21 @@ package core;
         R_FORMAT = 3'b001,
         U_FORMAT = 3'b010,
         S_FORMAT = 3'b011,
-        NOP      = 3'b100
+        B_FORMAT = 3'b100,
+        J_FORMAT = 3'b101,
+        NOP      = 3'b111
     } formats_t ;
 
     typedef enum logic [3:0]{
         LB = 4'b0000,
         LH = 4'b0001,
         LW = 4'b0010,
-        LBU= 4'b0011,
-        LHU= 4'b0100,
-        SB = 4'b0101,
-        SH = 4'b0110,
-        SW = 4'b0111,
-        MEM_NOP= 4'b1000
+        LBU= 4'b0100,
+        LHU= 4'b0101,
+        SB = 4'b1000,
+        SH = 4'b1001,
+        SW = 4'b1010,
+        MEM_NOP= 4'b1111
     } MEM_OP_t;
 
 

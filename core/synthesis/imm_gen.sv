@@ -42,6 +42,10 @@ module imm_generator
                 imm_o = {{21{instr_i[31]}},{instr_i[30:25],instr_i[11:7]}}; 
                 //$display("instruction in s %b\n",instr_i);
                 //$display("immediate sw : %d\n",imm_o);
+            end
+            core::B_FORMAT:begin
+                imm_o ={ {19{instr_i[31]}},{instr_i[31],instr_i[7],instr_i[30:25],instr_i[11:8],1'b0} };
+                $display("B Imm : %b , %d",imm_o,imm_o);
             end 
             default: begin
                  imm_o = 32'b0;

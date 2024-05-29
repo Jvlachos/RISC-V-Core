@@ -19,14 +19,17 @@ module alu
                             alu_bus_o.rd_res = alu_bus_i.rs1_data + alu_bus_i.imm;
                         end
                         core::R_FORMAT: begin
-                            alu_bus_o.rd_res =alu_bus_i.rs1_data + alu_bus_i.rs2_data;
+                            if(alu_bus_i.instr[`ADD_SUB_BIT])
+                                alu_bus_o.rd_res =alu_bus_i.rs1_data - alu_bus_i.rs2_data;
+                            else 
+                                alu_bus_o.rd_res =alu_bus_i.rs1_data + alu_bus_i.rs2_data;
                         end
                     endcase        
                 end
 
-                core::ALU_SUB: begin
-                    alu_bus_o.rd_res = alu_bus_i.rs1_data - alu_bus_i.rs2_data;
-                end
+               // core::ALU_SUB: begin
+              //      alu_bus_o.rd_res = alu_bus_i.rs1_data - alu_bus_i.rs2_data;
+             //   end
 
                 core::ALU_OR: begin
                     unique case(alu_bus_i.format)
@@ -94,17 +97,23 @@ module alu
                     endcase                    
                 end
 
-                core::ALU_SRL :begin
+                core::ALU_SRA_SRL :begin
                     unique case(alu_bus_i.format)
                         core::I_FORMAT: begin
-                            alu_bus_o.rd_res = alu_bus_i.rs1_data >> alu_bus_i.imm;          
+                            if(alu_bus_i.instr[`SRA_SRL_bit])
+                                alu_bus_o.rd_res = alu_bus_i.rs1_data >> alu_bus_i.imm;
+                            else 
+                                alu_bus_o.rd_res = alu_bus_i.rs1_data >>> alu_bus_i.imm;          
                         end
                         core::R_FORMAT: begin
-                            alu_bus_o.rd_res = alu_bus_i.rs1_data >> alu_bus_i.rs2_data;
+                            if(alu_bus_i.instr[`SRA_SRL_bit])
+                                alu_bus_o.rd_res = alu_bus_i.rs1_data >> alu_bus_i.rs2_data;
+                            else
+                                alu_bus_o.rd_res = alu_bus_i.rs1_data >>> alu_bus_i.rs2_data;
                         end
                     endcase                    
                 end
-
+    /*
                 core::ALU_SRA :begin
                     unique case(alu_bus_i.format)
                         core::I_FORMAT :begin
@@ -115,7 +124,7 @@ module alu
                         end
                     endcase                    
                 end
-
+*/
                 core::ALU_LUI :begin
                     alu_bus_o.rd_res = $signed(alu_bus_i.imm);
                 end

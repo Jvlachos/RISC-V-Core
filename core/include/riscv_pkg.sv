@@ -45,6 +45,16 @@ package riscv;
     } stype_t;
 
     typedef struct packed {
+        logic [31:25] imm;
+        logic [24:20] rs2;
+        logic [19:15] rs1;
+        logic [14:12] funct3;
+        logic [11:7]  imm_2;
+        logic [6:0]   opcode;
+    } btype_t;
+
+
+    typedef struct packed {
         logic [31:12] imm;
         logic [11:7]  rd;
         logic [6:0]   opcode;     
@@ -56,6 +66,7 @@ package riscv;
         itype_t itype;
         stype_t stype;
         utype_t utype;
+        btype_t btype;
     } instruction_t;
 
     localparam  LUI_OP   =   7'b0110111;  
@@ -65,12 +76,15 @@ package riscv;
     localparam  JALR_OP  =   7'b1100111;
 
     localparam  B_OP     =   7'b1100011;
-    localparam  BEQ_F3   =   3'b000;
-    localparam  BNE_F3   =   3'b001;
-    localparam  BLT_F3   =   3'b100;
-    localparam  BGE_F3   =   3'b101;
-    localparam  BLTU_F3  =   3'b110;
-    localparam  BGEU_F3  =   3'b111;
+
+    typedef enum logic [2:0] {    
+    BEQ_F3   =   3'b000,
+    BNE_F3   =   3'b001,
+    BLT_F3   =   3'b100,
+    BGE_F3   =   3'b101,
+    BLTU_F3  =   3'b110,
+    BGEU_F3  =   3'b111
+    } B_F3_t; 
 
     localparam  L_OP     =   7'b0000011;
 
@@ -93,7 +107,8 @@ package riscv;
     localparam  SLLI_F7  =   7'b0000000;
     localparam  SRLI_func=   7'b0000000;
     localparam  SRAI_func=   7'b0100000;
-
+    `define SRA_SRL_bit 30 
+    
 
     localparam  RR_OP   =    7'b0110011;
     typedef enum logic [2:0]{
@@ -109,7 +124,7 @@ package riscv;
 
     localparam  ADD_SRL_func=    7'b0000000;
     localparam  SUB_SRA_func=    7'b0100000;
-    
+    `define     ADD_SUB_BIT 30
 
     localparam  E_OP    =    7'b1110011;
     localparam  ECALL_i =    12'b000000000000;
@@ -118,6 +133,11 @@ package riscv;
     function automatic logic [31:0] gen_rr(logic [4:0] rs2,logic [4:0] rs1,R_F3_t f3,logic [4:0] rd ,logic select);
         logic [6:0] f7 = ((f3 == ADD_SUB || f3 == SRL_SRA) && select) ? SUB_SRA_func : ADD_SRL_func;
         return {f7,rs2,rs1,f3,rd,RR_OP};
+    endfunction
+
+    function automatic logic [31:0] gen_btype(logic [4:0] rs1,logic [4:0] rs2,B_F3_t f3,logic [6:0] imm,logic [4:0] imm_2);
+        $display("Im1 : %b Im2 : %b\n",imm,imm_2);
+        return {imm,rs2,rs1,f3,imm_2,B_OP};
     endfunction
 
     //I Format Generation
