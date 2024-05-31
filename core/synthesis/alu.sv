@@ -134,7 +134,7 @@ module alu
                 end
                 core::ALU_NOP: begin
                 end
-                default: $display("Illegal insts?\n");
+                default: $display("Illegal insts?");
             endcase
         end
         

@@ -58,8 +58,8 @@ package core;
     typedef struct packed {
         MEM_OP_t mem_op;
         ALU_OP_t alu_op;
-        bit is_branch;
         formats_t format;
+        bit is_branch;
         logic [31:0] instr;
         logic [31:0] imm;
         logic [4:0] rs1;
@@ -70,7 +70,18 @@ package core;
         logic [31:0] rs2_data;
         logic [31:0] pc;
     } pipeline_bus_t;
+
+    localparam BUS_BITS = $bits(pipeline_bus_t);
+    localparam BUS_DYN_BITS = $bits(MEM_OP_t) + $bits(ALU_OP_t) + $bits(formats_t);
+
+    typedef struct packed {
+        bit is_taken;
+        logic [31:0] branch_target;
+        
+    } br_cntrl_bus_t;
     
+
+   
 
 
 

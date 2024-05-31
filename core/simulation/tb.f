@@ -8,3 +8,4 @@
 ../synthesis/regfile_2r1w.sv
 ../synthesis/ex_stage.sv
 ../synthesis/alu.sv
+../synthesis/branch_unit.sv

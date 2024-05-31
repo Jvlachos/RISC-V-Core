@@ -91,7 +91,6 @@ package riscv;
     localparam  S_OP     =   7'b0100011;
 
     localparam  I_OP     =   7'b0010011;
-
     typedef enum logic [2:0] {
     ADDI_F3  =   3'b000,
     SLTI_F3  =   3'b010,
@@ -104,6 +103,7 @@ package riscv;
 
     } I_F3_t;
 
+    logic [31:0] I_NOP    =   {12'b0,5'b0,ADDI_F3,5'b0,I_OP};
     localparam  SLLI_F7  =   7'b0000000;
     localparam  SRLI_func=   7'b0000000;
     localparam  SRAI_func=   7'b0100000;
@@ -136,7 +136,7 @@ package riscv;
     endfunction
 
     function automatic logic [31:0] gen_btype(logic [4:0] rs1,logic [4:0] rs2,B_F3_t f3,logic [6:0] imm,logic [4:0] imm_2);
-        $display("Im1 : %b Im2 : %b\n",imm,imm_2);
+        //$write("Im1 : %b Im2 : %b\n",imm,imm_2);
         return {imm,rs2,rs1,f3,imm_2,B_OP};
     endfunction
 
@@ -196,7 +196,7 @@ package riscv;
     endfunction
 
     function automatic print_r(string id,reg_t rs2,reg_t rs1,reg_t rd);
-        $display("%s %s,%s,%s\n",id,rd,rs1,rs2);
+        $write("%s %s,%s,%s",id,rd,rs1,rs2);
     endfunction
 
     function automatic get_rr_str(string id,reg_t rs2,reg_t rs1,reg_t rd);
@@ -215,7 +215,7 @@ package riscv;
         riscv::reg_t rs2_t;
         riscv::reg_t rd_t;
         instruction = riscv::instruction_t'(instr); 
-        $display("Instruction : ");
+        $write("Instruction :");
         case (instruction.instruction[6:0])
             riscv::I_OP: begin
                 rs1_t = riscv::reg_t'(instruction.itype.rs1);
@@ -226,42 +226,42 @@ package riscv;
                 unique case (instruction.itype.funct3)
                 riscv::ADDI_F3: begin  
                     if(instruction.itype.rs1 == 5'b0 &&  instruction.itype.rd == 5'b0 && instruction.itype.imm ==0 )
-                        $display("NOP\n");
+                        $write("NOP");
                     else begin;
-                       $display("addi %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+                       $write("addi %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                     end
                 end
                 riscv::SLTI_F3: begin
-                    $display("slti %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+                    $write("slti %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                 end
                 riscv::SLTIU_F3:  begin
-                    $display("sltiu %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+                    $write("sltiu %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                 end
                 riscv::XORI_F3: begin 
-                    $display("xori %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+                    $write("xori %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                 end
                 riscv::ORI_F3: begin   
-                    $display("ori %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+                    $write("ori %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                 end
                 riscv::ANDI_F3:  begin
-                    $display("andi %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+                    $write("andi %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                 end
                 riscv::SLLI_F3: begin
-                    $display("slli %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+                    $write("slli %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                 end
 
                 riscv::SRLI_SRAI: begin 
                     case(instruction.instruction[31:25])
                         riscv::SRAI_func :begin
-                            $display("srai %s,%s,%d\n",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+                            $write("srai %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
                         end
                         riscv::SRLI_func :begin 
-                            $display("srli %s,%s,%d\n",rd_t.name(),rs1_t.name(),instruction.itype.imm);
+                            $write("srli %s,%s,%0d",rd_t.name(),rs1_t.name(),instruction.itype.imm);
                         end
-                        default: $display("Illegal srli_srai fun\n");
+                        default: $write("Illegal srli_srai fun\n");
                     endcase
                 end 
-                default: $display("Illegal I-Format Instruction!\n");
+                default: $write("Illegal I-Format Instruction!\n");
                 endcase
             end
 
@@ -272,15 +272,15 @@ package riscv;
                 case(instruction.stype.funct3)
                 
                 {riscv::SIGNED, riscv::BYTE}: begin 
-                    $display("sb %s,%0d(%s)\n", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
+                    $write("sb %s,%0d(%s)", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
                 end
                 {riscv::SIGNED, riscv::HWORD}:begin
-                    $display("sh %s,%0d(%s)\n", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
+                    $write("sh %s,%0d(%s)", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
                 end
                 {riscv::SIGNED, riscv::WORD}: begin 
-                    $display("sw %s,%0d(%s)\n", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
+                    $write("sw %s,%0d(%s)", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
                 end
-                default:$display("Illegal store?\n");
+                default:$write("Illegal store?\n");
                 endcase
             end          
             riscv::L_OP: begin 
@@ -288,29 +288,31 @@ package riscv;
                 rd_t  = riscv::reg_t'(instruction.itype.rd);
                 case(instruction.itype.funct3)
                 {riscv::SIGNED,riscv::BYTE}:begin
-                    $display("lb %s,%0d(%s)\n", rd_t.name, instruction.itype.imm, rs1_t.name);
+                    $write("lb %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
                 end
                 {riscv::SIGNED,riscv::HWORD}:begin 
-                    $display("lh %s,%0d(%s)\n", rd_t.name, instruction.itype.imm, rs1_t.name);
+                    $write("lh %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
                 end
                 {riscv::SIGNED,riscv::WORD}:begin 
-                    $display("lw %s,%0d(%s)\n", rd_t.name, instruction.itype.imm, rs1_t.name);
+                    $write("lw %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
                 end
                 {riscv::UNSIGNED,riscv::BYTE}:begin 
-                    $display("lbu %s,%0d(%s)\n", rd_t.name, instruction.itype.imm, rs1_t.name);
+                    $write("lbu %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
                 end
                 {riscv::UNSIGNED,riscv::HWORD}:begin 
-                    $display("lhu %s,%0d(%s)\n", rd_t.name, instruction.itype.imm, rs1_t.name);
+                    $write("lhu %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
                 end
 
-                default:$display("Illegal load?\n");            
+                default:$write("Illegal load?\n");            
                 endcase
             end
             riscv::LUI_OP: begin; end
             riscv::AUI_OP: begin; end
             riscv::JAL_OP: begin; end
             riscv::JALR_OP: begin; end
-            riscv::B_OP: begin; end
+            riscv::B_OP: begin; 
+                $write("Branch : %b",instruction.btype.funct3);
+            end
             riscv::RR_OP: begin;
                 rs1_t = riscv::reg_t'(instruction.rtype.rs1);
                 rd_t  = riscv::reg_t'(instruction.rtype.rs2);
@@ -326,7 +328,7 @@ package riscv;
                             riscv::print_r("sub",rs2_t,rs1_t,rd_t);
                         end
 
-                        default:$display("Illegal add/sub?\n");
+                        default:$write("Illegal add/sub?\n");
                     endcase
                 end
                 riscv::SLL:begin;
@@ -349,7 +351,7 @@ package riscv;
                         riscv::SUB_SRA_func:begin;
                             riscv::print_r("sra",rs2_t,rs1_t,rd_t);
                         end
-                        default:$display("Illegal srl/sra?\n");
+                        default:$write("Illegal srl/sra?\n");
                     endcase
                 end
                 riscv::OR:begin;
@@ -359,12 +361,12 @@ package riscv;
                     riscv::print_r("and",rs2_t,rs1_t,rd_t);
                 end
 
-                default: $display("Illegal Rformat?\n"); 
+                default: $write("Illegal Rformat?\n"); 
 
                 endcase
             end
             riscv::E_OP: begin; end
-            default: $display("Illegal Instruction!\n");
+            default: $write("Illegal Instruction!");
         endcase
 
 

@@ -116,7 +116,7 @@ module decoder
             id_bus_o.alu_op = core::ALU_OP_t'({core::ARITHM_PRFX,instruction.rtype.funct3});
          end
          riscv::E_OP: begin; end
-         default: $display("Illegal Instruction!\n");
+         default: $display("Illegal Instruction!/NOP");
       endcase
    end
 
