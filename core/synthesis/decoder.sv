@@ -92,8 +92,24 @@ module decoder
             id_bus_o.format = core::U_FORMAT;
             id_bus_o.alu_op = core::ALU_AUIPC;
          end
-         riscv::JAL_OP: begin; end
-         riscv::JALR_OP: begin; end
+         riscv::JAL_OP: begin; 
+            format = core::U_FORMAT;
+            rd_t   = riscv::reg_t'(instruction.utype.rd);
+            id_bus_o.is_branch = 1'b1;
+            id_bus_o.rd = instruction.utype.rd;
+            id_bus_o.format = core::U_FORMAT;
+            id_bus_o.alu_op = core::ALU_JAL;
+         end
+         riscv::JALR_OP: begin;
+            format = core::J_FORMAT;
+            id_bus_o.is_branch = 1'b1;
+            rd_t = riscv::reg_t'(instruction.itype.rd);
+            rs1_t = riscv::reg_t'(instruction.itype.rs1);
+            id_bus_o.rd = instruction.itype.rd;
+            id_bus_o.rs1 = instruction.itype.rs1;
+            id_bus_o.format = core::J_FORMAT;
+            id_bus_o.alu_op = core::ALU_JALR;
+         end
          riscv::B_OP: begin;
             format = core::B_FORMAT;
             rs1_t = riscv::reg_t'(instruction.btype.rs1);

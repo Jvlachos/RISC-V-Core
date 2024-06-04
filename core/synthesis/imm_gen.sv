@@ -34,17 +34,29 @@ module imm_generator
                 if(instruction.utype.opcode == riscv::LUI_OP || instruction.utype.opcode == riscv::AUI_OP )    begin
                     imm_o = {instruction.utype.imm,12'b0};
                 end
+                else if(instruction.utype.opcode == riscv::JAL_OP) begin
+                    imm_o = {instr_i[31],instr_i[30:20],instr_i[19:12],12'b0};
+                end
+                else begin 
+                    ;
+                end
+            end
+            core::J_FORMAT: begin
+                if(instruction.itype.opcode == riscv::JALR_OP) begin
+                    imm_o = {{12{instr_i[31]}},{instr_i[19:12],instr_i[20],instr_i[30:25],instr_i[24:21],1'b0}};
+                end 
                 else begin
                     ;
                 end
             end
+
             core::S_FORMAT:begin
-                imm_o = {{21{instr_i[31]}},{instr_i[30:25],instr_i[11:7]}}; 
+                imm_o = {{21{instr_i[31]}},{instr_i[30:25],instr_i[11:8],instr_i[7]}}; 
                 //$display("instruction in s %b\n",instr_i);
                 //$display("immediate sw : %d\n",imm_o);
             end
             core::B_FORMAT:begin
-                imm_o ={ {19{instr_i[31]}},{instr_i[31],instr_i[7],instr_i[30:25],instr_i[11:8],1'b0} };
+                imm_o ={ {19{instr_i[31]}},{instr_i[31],instr_i[7],instr_i[30:25],instr_i[11:8],1'b0}};
                 $display("B Imm : %b , %d",imm_o,imm_o);
             end 
             default: begin

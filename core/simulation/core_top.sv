@@ -20,7 +20,6 @@ module core_top;
     core::br_cntrl_bus_t br_bus;
    
     int cycle_no = 0;
-/*
     if_stage if_s(
     .clk(clk),
     .rst(rst),
@@ -29,7 +28,6 @@ module core_top;
     .pc_incr_en_i(pc_incr),
     .instr_o(instruction),
     .pc_o(pc));
-*/
     //decoder_tb dec_s(.clk(clk),.rst(rst),.instruction_i(instruction));
     id_stage id_s(
         .clk(clk),
@@ -60,9 +58,9 @@ module core_top;
 
         rst = 1;
         repeat(10) begin
-            pc_incr = 0;
+            pc_incr = 1;
             #5;
-            instruction = db_i_mem[i_index];
+//            instruction = db_i_mem[i_index];
             @(posedge clk);
             cycle_no ++;
             pc_incr = 0;
@@ -92,8 +90,8 @@ module core_top;
         riscv::decode_instr(id_bus.instr);
         $write("\t\t\t");
         riscv::decode_instr(ex_bus.instr);
-        $write("\nMemOp: %s\t\t\t\t|\t\t MemOp: %s\nAluOp: %s\t\t\t\t|\t\t AluOp: %s\n",
-        id_bus.mem_op.name(),ex_bus.mem_op.name(),id_bus.alu_op.name(),ex_bus.alu_op.name());
+        $write("\nMemOp: %s\t\t\t\t|\t\t MemOp: %s\nAluOp: %s\t\t\t\t|\t\t AluOp: %s\nPC: 0x%h\t\t\t\t|\t\t PC: 0x%h\n",
+        id_bus.mem_op.name(),ex_bus.mem_op.name(),id_bus.alu_op.name(),ex_bus.alu_op.name(),id_bus.pc,ex_bus.pc);
 
     endtask
 

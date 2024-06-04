@@ -2,7 +2,8 @@ package core;
     
     typedef enum  logic [1:0] { 
         BRANCH_PRFX = 2'b00,
-        ARITHM_PRFX = 2'b01
+        ARITHM_PRFX = 2'b01,
+        J_PRFX      = 2'b10
     } alu_prefix_t;
 
     typedef enum  logic {
@@ -29,7 +30,9 @@ package core;
         ALU_OR          = 5'b01110,
         ALU_AND         = 5'b01111,
         ALU_AUIPC       = 5'b10000,
-        ALU_NOP         = 5'b10010  
+        ALU_JAL         = 5'b10001,
+        ALU_JALR        = 5'b10010,
+        ALU_NOP         = 5'b11111  
     } ALU_OP_t;
 
     typedef enum logic [2:0]{
