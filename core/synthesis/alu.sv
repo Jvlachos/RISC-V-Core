@@ -27,10 +27,6 @@ module alu
                     endcase        
                 end
 
-               // core::ALU_SUB: begin
-              //      alu_bus_o.rd_res = alu_bus_i.rs1_data - alu_bus_i.rs2_data;
-             //   end
-
                 core::ALU_OR: begin
                     unique case(alu_bus_i.format)
                         core::I_FORMAT: begin

@@ -10,7 +10,7 @@ module ex_stage
 );
 
     core::pipeline_bus_t ex_bus;
-    
+    logic [31:0] rd_branch; 
 
     alu alu_instance(
      .clk(clk),
@@ -21,7 +21,8 @@ module ex_stage
     branch_unit branch_unit_instance(
         .bus_i(bus_i),
         .flush_o(flush_o),
-        .br_bus_o(br_bus_o));
+        .br_bus_o(br_bus_o),
+        .rd_o(rd_branch));
 
     always_ff @( posedge clk,negedge rst ) begin  
        if(~rst) begin
@@ -32,7 +33,8 @@ module ex_stage
             ex_bus_o.instr <= riscv::I_NOP;
        end
         else
-            ex_bus_o <= ex_bus; 
+            ex_bus_o <= ex_bus;
+            ex_bus_o.rd_res <= bus_i.is_branch ? rd_branch : ex_bus.rd_res; 
     end
 
 

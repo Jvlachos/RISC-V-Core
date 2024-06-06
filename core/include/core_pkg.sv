@@ -16,13 +16,12 @@ package core;
         ALU_BEQ         = 5'b00000,
         ALU_BNE         = 5'b00001,
         ALU_LUI         = 5'b00010,
-        //ALU_SRL        = 5'b00011,
         ALU_BLT         = 5'b00100,
         ALU_BGE         = 5'b00101,
         ALU_BLTU        = 5'b00110,
         ALU_BGEU        = 5'b00111,
-        ALU_ADD         = 5'b01000, //BEQ 1 000
-        ALU_SLL         = 5'b01001, // BNE 1 001
+        ALU_ADD         = 5'b01000, 
+        ALU_SLL         = 5'b01001, 
         ALU_SLT         = 5'b01010,
         ALU_SLTU        = 5'b01011,
         ALU_XOR         = 5'b01100,

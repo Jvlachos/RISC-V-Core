@@ -7,7 +7,8 @@ module if_stage
     input  logic [core::DATA_BYTES-1:0] wen_i,
     input  logic pc_incr_en_i,
     output logic [31:0] instr_o,
-    output logic [31:0] pc_o
+    output logic [31:0] pc_o,
+    input core::br_cntrl_bus_t br_bus_i
 );
 
     logic [31:0] pc;
@@ -28,7 +29,10 @@ module if_stage
     always_comb begin  
         pc = 'h100;
 
-        if(pc_incr_en_i) begin 
+        if(br_bus_i.is_taken) begin
+            pc = br_bus_i.branch_target;
+        end
+        else if(pc_incr_en_i) begin 
             pc = pc_o + 4;            
         end
         else begin

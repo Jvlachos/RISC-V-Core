@@ -27,7 +27,8 @@ module core_top;
     .wen_i(wen),
     .pc_incr_en_i(pc_incr),
     .instr_o(instruction),
-    .pc_o(pc));
+    .pc_o(pc),
+    .br_bus_i(br_bus));
     //decoder_tb dec_s(.clk(clk),.rst(rst),.instruction_i(instruction));
     id_stage id_s(
         .clk(clk),
