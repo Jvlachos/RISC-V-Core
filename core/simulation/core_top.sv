@@ -63,7 +63,7 @@ module core_top;
             #5;
 //            instruction = db_i_mem[i_index];
             @(posedge clk);
-            cycle_no ++;
+//            cycle_no ++;
             pc_incr = 0;
             #5;
             display_side();
@@ -74,6 +74,10 @@ module core_top;
             i_index++;
         end
         $finish;
+    end
+
+    always @(posedge clk) begin
+        cycle_no <= cycle_no + 1;
     end
 
     task display_bus(pipeline_bus_t curr_bus,string msg);

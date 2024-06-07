@@ -9,3 +9,9 @@
 ../synthesis/ex_stage.sv
 ../synthesis/alu.sv
 ../synthesis/branch_unit.sv
+../synthesis/memory_unit.sv
+../synthesis/mem_sync_sp_rvdmem.sv
+../synthesis/mem_stage.sv
+../synthesis/store_cntrl.sv
+../synthesis/load_cntrl.sv
+../synthesis/mem_signext.sv

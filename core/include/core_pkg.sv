@@ -71,26 +71,30 @@ package core;
         logic [31:0] rs1_data;
         logic [31:0] rs2_data;
         logic [31:0] pc;
+        bit rf_wr_en;
     } pipeline_bus_t;
 
     localparam BUS_BITS = $bits(pipeline_bus_t);
     localparam BUS_DYN_BITS = $bits(MEM_OP_t) + $bits(ALU_OP_t) + $bits(formats_t);
+    localparam DEPTH = 4096 ;
+    localparam ADDR_WIDTH = $clog2(DEPTH);
+    localparam DATA_WIDTH =32;
+    localparam DATA_BYTES = DATA_WIDTH/8;
+
 
     typedef struct packed {
         bit is_taken;
         logic [31:0] branch_target;
         
     } br_cntrl_bus_t;
+
+    typedef struct packed {
+        logic [DATA_BYTES-1:0] write_en;
+        logic [31:0] addr;
+        logic [31:0] r_data;
+        logic [31:0] w_data;
+    } mem_cntrl_bus_t;
     
-
-   
-
-
-
-    localparam DEPTH = 4096 ;
-    localparam ADDR_WIDTH = $clog2(DEPTH);
-    localparam DATA_WIDTH =32;
-    localparam DATA_BYTES = DATA_WIDTH/8;
 
 
 

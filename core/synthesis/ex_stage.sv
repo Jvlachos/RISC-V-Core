@@ -6,11 +6,18 @@ module ex_stage
     input core::pipeline_bus_t bus_i,
     output core::pipeline_bus_t ex_bus_o,
     output logic flush_o,
-    output core::br_cntrl_bus_t br_bus_o
+    output core::br_cntrl_bus_t br_bus_o,
+    output core::mem_cntrl_bus_t ex2mem_o
 );
 
     core::pipeline_bus_t ex_bus;
+    core::mem_cntrl_bus_t ex2mem;
+
     logic [31:0] rd_branch; 
+
+    memory_unit mem_unit_instance(
+        .bus_i(bus_i),
+        .mem_bus(ex2mem));
 
     alu alu_instance(
      .clk(clk),
@@ -31,10 +38,12 @@ module ex_stage
             ex_bus_o.alu_op <= core::ALU_NOP;
             ex_bus_o.format <= core::NOP;
             ex_bus_o.instr <= riscv::I_NOP;
+            ex2mem_o <= '0;
        end
         else
             ex_bus_o <= ex_bus;
             ex_bus_o.rd_res <= bus_i.is_branch ? rd_branch : ex_bus.rd_res; 
+            ex2mem_o <= ex2mem;
     end
 
 

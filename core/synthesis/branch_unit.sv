@@ -3,7 +3,7 @@ module branch_unit
     import core::*;
     import riscv::*;
 (
-    input pipeline_bus_t bus_i,
+    input core::pipeline_bus_t bus_i,
     output logic flush_o,
     output core::br_cntrl_bus_t br_bus_o,
     output logic [31:0] rd_o
