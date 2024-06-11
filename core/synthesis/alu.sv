@@ -12,6 +12,7 @@ module alu
         
 
         if(~alu_bus_i.is_branch) begin
+            alu_bus_o.rf_wr_en = 1'b1;
             unique case(alu_bus_i.alu_op) 
                 core::ALU_ADD: begin
                     unique case(alu_bus_i.format)

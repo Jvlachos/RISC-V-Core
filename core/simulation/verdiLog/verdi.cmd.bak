@@ -1,0 +1,241 @@
+simSetSimulator "-vcssv" -exec "./simv" -args "-l sim.log" -uvmDebug on -simDelim
+debImport "-i" "-simflow" "-dbdir" "./simv.daidir"
+srcTBInvokeSim
+verdiSetActWin -dock widgetDock_<Member>
+verdiSetActWin -dock widgetDock_MTB_SOURCE_TAB_1
+srcDeselectAll -win $_nTrace1
+wvCreateWindow
+wvAddAllSignals -win $_nWave3
+wvGetSignalOpen -win $_nWave3
+srcTBRunSim
+verdiSetActWin -dock widgetDock_<Inst._Tree>
+srcHBSelect "core_top.id_s.ins_decoder.rf" -win $_nTrace1
+srcHBSelect "core_top.id_s.ins_decoder.rf" -win $_nTrace1
+srcHBAddObjectToWave -clipboard
+wvDrop -win $_nWave3
+wvScrollDown -win $_nWave3 1
+verdiSetActWin -win $_nWave3
+wvScrollDown -win $_nWave3 0
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+verdiDockWidgetMaximize -dock windowDock_nWave_3
+srcTBSimReset
+verdiSetActWin -dock widgetDock_MTB_SOURCE_TAB_1
+verdiSetActWin -win $_nWave3
+wvSelectSignal -win $_nWave3 {( "rf" 8 )} 
+wvSelectSignal -win $_nWave3 {( "rf" 8 )} 
+wvSelectSignal -win $_nWave3 {( "rf" 5 )} 
+wvSelectSignal -win $_nWave3 {( "rf" 3 )} 
+wvSelectSignal -win $_nWave3 {( "rf" 4 )} 
+wvSelectSignal -win $_nWave3 {( "rf" 7 )} 
+wvSelectSignal -win $_nWave3 {( "rf" 8 )} 
+srcTBRunSim
+wvSelectSignal -win $_nWave3 {( "rf" 5 )} 
+wvSetCursor -win $_nWave3 425.036615 -snap {("rf" 6)}
+verdiDockWidgetRestore -dock windowDock_nWave_3
+srcHBSelect "core_top.id_s.ins_decoder.rf.unnamed\$\$_0" -win $_nTrace1
+verdiSetActWin -dock widgetDock_<Inst._Tree>
+srcHBSelect "core_top.id_s.ins_decoder.rf" -win $_nTrace1
+srcSetScope "core_top.id_s.ins_decoder.rf" -delim "." -win $_nTrace1
+srcHBSelect "core_top.id_s.ins_decoder.rf" -win $_nTrace1
+srcDeselectAll -win $_nTrace1
+srcSelect -signal "rf" -line 23 -pos 1 -win $_nTrace1
+verdiSetActWin -dock widgetDock_MTB_SOURCE_TAB_1
+srcAddSelectedToWave -clipboard -win $_nTrace1
+wvDrop -win $_nWave3
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+verdiSetActWin -win $_nWave3
+wvSelectSignal -win $_nWave3 {( "rf" 8 )} 
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+srcHBSelect "core_top.id_s.ins_decoder.im_gen" -win $_nTrace1
+verdiSetActWin -dock widgetDock_<Inst._Tree>
+srcHBSelect "core_top.id_s.ins_decoder" -win $_nTrace1
+srcSetScope "core_top.id_s.ins_decoder" -delim "." -win $_nTrace1
+srcHBSelect "core_top.id_s.ins_decoder" -win $_nTrace1
+srcDeselectAll -win $_nTrace1
+srcSelect -signal "wb_bus_i" -line 9 -pos 1 -win $_nTrace1
+verdiSetActWin -dock widgetDock_MTB_SOURCE_TAB_1
+srcAddSelectedToWave -clipboard -win $_nTrace1
+wvDrop -win $_nWave3
+verdiDockWidgetMaximize -dock windowDock_nWave_3
+verdiSetActWin -win $_nWave3
+srcTBSimReset
+verdiSetActWin -dock widgetDock_MTB_SOURCE_TAB_1
+wvSelectSignal -win $_nWave3 {( "rf" 10 )} 
+wvExpandBus -win $_nWave3
+verdiSetActWin -win $_nWave3
+wvScrollDown -win $_nWave3 1
+srcTBRunSim
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvZoomOut -win $_nWave3
+wvSetCursor -win $_nWave3 70.930372 -snap {("rf" 12)}
+wvSetCursor -win $_nWave3 237.889556 -snap {("rf" 12)}
+wvZoomIn -win $_nWave3
+wvZoomIn -win $_nWave3
+wvZoomIn -win $_nWave3
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+srcTBSimReset
+srcTBRunSim
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvSelectSignal -win $_nWave3 {( "rf" 10 )} 
+wvSelectSignal -win $_nWave3 {( "rf" 10 )} 
+wvSetCursor -win $_nWave3 79.933073 -snap {("rf" 8)}
+wvSelectSignal -win $_nWave3 {( "rf" 10 )} 
+wvSelectSignal -win $_nWave3 {( "rf" 11 )} 
+wvScrollDown -win $_nWave3 5
+wvScrollDown -win $_nWave3 3
+wvSelectSignal -win $_nWave3 {( "rf" 11 12 13 14 15 16 17 18 19 20 21 22 23 24 \
+           )} 
+wvCollapseBus -win $_nWave3
+wvScrollUp -win $_nWave3 3
+wvScrollDown -win $_nWave3 3
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvCollapseBus -win $_nWave3
+wvScrollUp -win $_nWave3 8
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollUp -win $_nWave3 1
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+verdiDockWidgetRestore -dock windowDock_nWave_3
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 1
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvScrollDown -win $_nWave3 0
+wvCut -win $_nWave3
+wvSetPosition -win $_nWave3 {("rf" 10)}
+wvScrollUp -win $_nWave3 4
+wvSelectGroup -win $_nWave3 {rf}
+wvCut -win $_nWave3
+wvSetPosition -win $_nWave3 {("G2" 0)}
+verdiSetActWin -dock widgetDock_<Inst._Tree>
+srcHBSelect "core_top.ex_s" -win $_nTrace1
+srcSetScope "core_top.ex_s" -delim "." -win $_nTrace1
+srcHBSelect "core_top.ex_s" -win $_nTrace1
+srcDeselectAll -win $_nTrace1
+verdiSetActWin -dock widgetDock_MTB_SOURCE_TAB_1
+srcDeselectAll -win $_nTrace1
+debReload
+srcDeselectAll -win $_nTrace1
+srcSelect -signal "ex_bus_o" -line 46 -pos 1 -win $_nTrace1
+srcAddSelectedToWave -clipboard -win $_nTrace1
+wvDrop -win $_nWave3
+wvUnknownSaveResult -win $_nWave3 -clear
+srcDeselectAll -win $_nTrace1
+srcDeselectAll -win $_nTrace1
+srcDeselectAll -win $_nTrace1
+srcSelect -signal "ex_bus" -line 46 -pos 1 -win $_nTrace1
+srcAddSelectedToWave -clipboard -win $_nTrace1
+wvDrop -win $_nWave3
+wvUnknownSaveResult -win $_nWave3 -clear
+debExit

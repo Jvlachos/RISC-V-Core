@@ -6,8 +6,7 @@ module mem_stage
    input logic rst,
    input core::pipeline_bus_t bus_i,
    input core::mem_cntrl_bus_t mem_cntrl_i,
-   output core::pipeline_bus_t mem_bus_o,
-   output core::mem_cntrl_bus_t mem_cntrl_o
+   output core::pipeline_bus_t mem_bus_o
 );
 
     logic [31:0] rdata;    
@@ -45,6 +44,17 @@ module mem_stage
         .o_rdata(rdata)
     );
 
-
+    always_ff @( posedge clk,negedge rst ) begin : blockName
+       if(~rst) begin
+            mem_bus_o[core::BUS_BITS-1:0] <= '0;
+            mem_bus_o.mem_op <= core::MEM_NOP;
+            mem_bus_o.alu_op <= core::ALU_NOP;
+            mem_bus_o.format <= core::NOP;
+            mem_bus_o.instr <= riscv::I_NOP;
+        end
+        else begin
+            mem_bus_o <= mem2wb;
+        end
+    end
 
 endmodule

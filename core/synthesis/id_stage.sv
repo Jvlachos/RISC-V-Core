@@ -6,28 +6,51 @@ module id_stage
     input logic rst,
     input logic [31:0] instruction_i,
     input  logic [31:0] pc_i,
+    input  core::pipeline_bus_t wb_bus_i,
     output core::pipeline_bus_t id_bus_o,
-    input logic flush_i);
+    input logic flush_i,
+    input bit stall_i,
+    output logic[2:0] format_o);
 
     core::pipeline_bus_t id_bus;
-    
+    bit stall_ff;
 
     decoder ins_decoder(
     .clk(clk),
     .rst(rst),
     .instruction_i(instruction_i),
     .pc_i(pc_i),
-    .id_bus_o(id_bus));
+    .wb_bus_i(wb_bus_i),
+    .id_bus_o(id_bus),
+    .format(format_o));
 
+
+    always_ff@(posedge clk,negedge rst) begin
+        if(~rst)
+            stall_ff <= 0;
+        else begin
+            if(stall_ff)
+                stall_ff <= stall_ff;
+            else
+                stall_ff <= stall_i;
+        end
+    end
  
     always_ff @(posedge clk,negedge rst ) begin
-        if(~rst | flush_i) begin
-            $display("Flushing..\n");
+        if(~rst) begin
             id_bus_o[core::BUS_BITS-1:0] <= '0;
             id_bus_o.mem_op <= core::MEM_NOP;
             id_bus_o.alu_op <= core::ALU_NOP;
             id_bus_o.format <= core::NOP;
             id_bus_o.instr  <= riscv::I_NOP;
+        end
+        else if(flush_i || stall_ff) begin
+            $display("Flushing..\n");
+            id_bus_o[core::BUS_BITS-1:0] <= '0;
+            id_bus_o.mem_op <= core::MEM_NOP;
+            id_bus_o.alu_op <= core::ALU_NOP;
+            id_bus_o.format <= core::NOP;
+            id_bus_o.instr  <= riscv::I_NOP; 
         end
         else begin
             id_bus_o <= id_bus;

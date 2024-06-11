@@ -45,6 +45,7 @@ module branch_unit
                 if(bus_i.alu_op == core::ALU_JAL) begin
                     br_bus_o.is_taken = 1'b1;
                     br_bus_o.branch_target = bus_i.pc + bus_i.imm;
+                    rd_o = bus_i.pc + 4;
                    // $display("Jal target : 0x%h + 0x%h = 0x%h\n",bus_i.rs1_data,bus_i.imm,br_bus_o.branch_target);
                 //br_bus_o.branch_target[0] = 1'b0;
                 end

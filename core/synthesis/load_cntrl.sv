@@ -10,7 +10,6 @@ module load_cntrl
     always_comb begin
         assign mem2se_o = bus_i;
         if(bus_i.mem_op != core::MEM_NOP && bus_i.mem_op[0] == core::LOAD_PRFX)begin
-            mem2se_o.rf_wr_en = 1'b1;
            unique case(bus_i.mem_op)
                 core::LB:begin
                     mem2se_o.rd_res[7:0] = rdata_i [7:0]; 

@@ -1,0 +1,2 @@
+Command Line: /eda/synopsys/2022-23/RHELx86/VERDI_2022.06-SP2/platform/LINUXAMD64/bin/Novas -i -simflow -simBin ./simv -simDelim -l sim.log
+uname(Linux socofreta.ics.forth.gr 3.10.0-957.5.1.el7.x86_64 #1 SMP Fri Feb 1 14:54:57 UTC 2019 x86_64)

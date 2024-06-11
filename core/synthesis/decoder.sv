@@ -6,9 +6,10 @@ module decoder
    input logic rst, 
    input logic [31:0] instruction_i,
    input  logic [31:0] pc_i,
-   output core::pipeline_bus_t id_bus_o
+   input core::pipeline_bus_t wb_bus_i,
+   output core::pipeline_bus_t id_bus_o,
+   output logic [2:0] format
 );
-   logic [2:0] format;
    imm_generator im_gen(
         .instr_i(instruction_i),
         .format_i(format),
@@ -18,9 +19,9 @@ module decoder
       .clk(clk),
       .i_raddr_a(id_bus_o.rs1),
       .i_raddr_b(id_bus_o.rs2),
-      .i_wen(0),
-      .i_waddr(0),
-      .i_wdata(0),
+      .i_wen(wb_bus_i.rf_wr_en),
+      .i_waddr(wb_bus_i.rd),
+      .i_wdata(wb_bus_i.rd_res),
       .o_rdata_a(id_bus_o.rs1_data),
       .o_rdata_b(id_bus_o.rs2_data)
    );
@@ -43,6 +44,7 @@ module decoder
       id_bus_o.is_branch   = 1'b0;
       id_bus_o.rd_res      =  'b0;
       id_bus_o.pc          =  pc_i;
+      id_bus_o.rf_wr_en    = 1'b0;
 
        case (instruction.instruction[6:0])
          riscv::I_OP: begin
@@ -58,6 +60,7 @@ module decoder
                      id_bus_o.alu_op = core::ALU_NOP;
             else begin
                id_bus_o.alu_op = core::ALU_OP_t'({core::ARITHM_PRFX,instruction.itype.funct3});
+               id_bus_o.rf_wr_en = 1'b1;
             end
          end
 
@@ -77,6 +80,7 @@ module decoder
             id_bus_o.rd  = instruction.itype.rd;
             id_bus_o.format = core::I_FORMAT;
             id_bus_o.mem_op = core::MEM_OP_t'({core::LOAD_PRFX,instruction.itype.funct3});
+            id_bus_o.rf_wr_en = 1'b1;
          end
          riscv::LUI_OP: begin;
             format = core::U_FORMAT;
@@ -84,6 +88,7 @@ module decoder
             id_bus_o.rd = instruction.utype.rd;
             id_bus_o.format = core::U_FORMAT;
             id_bus_o.alu_op    = core::ALU_LUI;
+            id_bus_o.rf_wr_en  =1'b1;
          end
          riscv::AUI_OP: begin;
             format = core::U_FORMAT;
@@ -91,6 +96,7 @@ module decoder
             id_bus_o.rd = instruction.utype.rd;
             id_bus_o.format = core::U_FORMAT;
             id_bus_o.alu_op = core::ALU_AUIPC;
+            id_bus_o.rf_wr_en = 1'b1;
          end
          riscv::JAL_OP: begin; 
             format = core::J_FORMAT;
@@ -99,6 +105,7 @@ module decoder
             id_bus_o.rd = instruction.utype.rd;
             id_bus_o.format = core::J_FORMAT;
             id_bus_o.alu_op = core::ALU_JAL;
+            id_bus_o.rf_wr_en = 1'b1;
          end
          riscv::JALR_OP: begin;
             format = core::J_FORMAT;
@@ -109,6 +116,7 @@ module decoder
             id_bus_o.rs1 = instruction.itype.rs1;
             id_bus_o.format = core::J_FORMAT;
             id_bus_o.alu_op = core::ALU_JALR;
+            id_bus_o.rf_wr_en = 1'b1;
          end
          riscv::B_OP: begin;
             format = core::B_FORMAT;
@@ -130,6 +138,7 @@ module decoder
             id_bus_o.rs2 = instruction.rtype.rs2;
             id_bus_o.format = core::R_FORMAT;
             id_bus_o.alu_op = core::ALU_OP_t'({core::ARITHM_PRFX,instruction.rtype.funct3});
+            id_bus_o.rf_wr_en = 1'b1;
          end
          riscv::E_OP: begin; end
          default: $display("Illegal Instruction!/NOP");

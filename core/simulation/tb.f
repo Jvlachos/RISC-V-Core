@@ -15,3 +15,5 @@
 ../synthesis/store_cntrl.sv
 ../synthesis/load_cntrl.sv
 ../synthesis/mem_signext.sv
+../synthesis/wb_stage.sv
+../synthesis/stall_controller.sv

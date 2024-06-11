@@ -42,7 +42,7 @@ module ex_stage
        end
         else
             ex_bus_o <= ex_bus;
-            ex_bus_o.rd_res <= bus_i.is_branch ? rd_branch : ex_bus.rd_res; 
+            ex_bus_o.rd_res <= bus_i.is_branch ? rd_branch : ex_bus.rd_res;
             ex2mem_o <= ex2mem;
     end
 
