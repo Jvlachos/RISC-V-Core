@@ -1,7 +1,7 @@
 #! /bin/bash
-
-cd  ../../../code/"$1" \
+cd  ../../../code/"$1" &&
 source ../rv32i-settings.sh &&
-make clean && make  
+make clean && make &&
 cp "$1".imem.dat ../../project/RISC-V-Core/code/ihex/code.hex && make clean
 echo done!
+

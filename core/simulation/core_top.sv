@@ -21,18 +21,34 @@ module core_top;
     core::mem_cntrl_bus_t mem_cntrl;
     core::pipeline_bus_t mem_bus;
     core::pipeline_bus_t wb_bus;
+    core::pipeline_bus_t id2fw;
     bit stall;
+    bit pipeline_stalled;
     logic [2:0] format;
-    bit unlock;
+    bit unstall;
     int cycle_no = 0;
-    
+    core::fw_cntrl_bus_t fw_cntrl;
+    core::bypass_bus_t mem_bypass;
+    core::bypass_bus_t wb_bypass;
+
+    fw_controller fw_control(
+        .clk(clk),
+        .rst(rst),
+        .id_bus_i(id2fw),
+        .ex_bus_i(id_bus),
+        .mem_bus_i(ex_bus),
+        .fw_cntrl_o(fw_cntrl));    
 
     stall_controller stall_cntrl(
+        .clk(clk),
+        .rst(rst),
         .instr_i(instruction),
         .exmem_bus_i(id_bus),
-        .unlock_i(unlock),
+        .unstall_i(unstall),
         .stall_o(stall),
-        .format_i(format));
+        .format_i(format),
+        .pipeline_stalled_i(id_bus.pipeline_stall),
+        .pipeline_stalled_o(pipeline_stalled));
 
     if_stage if_s(
     .clk(clk),
@@ -53,12 +69,16 @@ module core_top;
         .id_bus_o(id_bus),
         .flush_i(pipeline_flush),
         .stall_i(stall),
-        .format_o(format));
+        .format_o(format),
+        .id2fw_cntrl_o(id2fw));
 
     ex_stage ex_s(
         .clk(clk),
         .rst(rst),
         .bus_i(id_bus),
+        .fw_cntrl_i(fw_cntrl),
+        .mem_bypass_i(mem_bypass),
+        .wb_bypass_i(wb_bypass),
         .ex_bus_o(ex_bus),
         .flush_o(pipeline_flush),
         .br_bus_o(br_bus),
@@ -76,7 +96,7 @@ module core_top;
         .rst(rst),
         .bus_i(mem_bus),
         .wb_bus_o(wb_bus),
-        .unlock_o(unlock));
+        .unstall_o(unstall));
 
     integer i_index; 
 

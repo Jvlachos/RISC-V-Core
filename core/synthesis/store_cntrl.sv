@@ -8,8 +8,11 @@ module store_cntrl
 );
 
     always_comb begin : store_unit
-        assign store_cntrl_o = mem_cntrl_i;
-        if(bus_i.mem_op != core::MEM_NOP & &bus_i.mem_op[0] == core::STORE_PRFX) begin
+        store_cntrl_o.addr = mem_cntrl_i.addr;
+        store_cntrl_o.r_data = mem_cntrl_i.r_data;
+        store_cntrl_o.w_data = mem_cntrl_i.w_data;
+        store_cntrl_o.write_en = '0;
+        if(bus_i.mem_op != core::MEM_NOP && bus_i.mem_op[MEM_OP_BITS-1] == core::STORE_PRFX) begin
             unique case(bus_i.mem_op)
                 core::SB:begin
                     store_cntrl_o.write_en = 4'b0001;
@@ -17,7 +20,7 @@ module store_cntrl
                 core::SH:begin
                     store_cntrl_o.write_en = 4'b0011;
                 end
-                core::SB:begin
+                core::SW:begin
                     store_cntrl_o.write_en = 4'b1111;
                 end
             endcase 

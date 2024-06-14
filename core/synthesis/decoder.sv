@@ -45,6 +45,7 @@ module decoder
       id_bus_o.rd_res      =  'b0;
       id_bus_o.pc          =  pc_i;
       id_bus_o.rf_wr_en    = 1'b0;
+      id_bus_o.pipeline_stall =1'b0;
 
        case (instruction.instruction[6:0])
          riscv::I_OP: begin

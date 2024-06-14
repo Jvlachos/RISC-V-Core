@@ -10,11 +10,11 @@ module id_stage
     output core::pipeline_bus_t id_bus_o,
     input logic flush_i,
     input bit stall_i,
-    output logic[2:0] format_o);
+    output logic[2:0] format_o,
+    output core::pipeline_bus_t id2fw_cntrl_o);
 
     core::pipeline_bus_t id_bus;
-    bit stall_ff;
-
+    assign id2fw_cntrl_o = id_bus;
     decoder ins_decoder(
     .clk(clk),
     .rst(rst),
@@ -25,16 +25,6 @@ module id_stage
     .format(format_o));
 
 
-    always_ff@(posedge clk,negedge rst) begin
-        if(~rst)
-            stall_ff <= 0;
-        else begin
-            if(stall_ff)
-                stall_ff <= stall_ff;
-            else
-                stall_ff <= stall_i;
-        end
-    end
  
     always_ff @(posedge clk,negedge rst ) begin
         if(~rst) begin
@@ -44,13 +34,22 @@ module id_stage
             id_bus_o.format <= core::NOP;
             id_bus_o.instr  <= riscv::I_NOP;
         end
-        else if(flush_i || stall_ff) begin
+        else if(flush_i ) begin
             $display("Flushing..\n");
             id_bus_o[core::BUS_BITS-1:0] <= '0;
             id_bus_o.mem_op <= core::MEM_NOP;
             id_bus_o.alu_op <= core::ALU_NOP;
             id_bus_o.format <= core::NOP;
             id_bus_o.instr  <= riscv::I_NOP; 
+        end
+        else if(stall_i) begin
+            $display("Stalling..\n");
+            id_bus_o[core::BUS_BITS-1:0] <= '0;
+            id_bus_o.mem_op <= core::MEM_NOP;
+            id_bus_o.alu_op <= core::ALU_NOP;
+            id_bus_o.format <= core::NOP;
+            id_bus_o.instr  <= riscv::I_NOP;
+            id_bus_o.pipeline_stall <= 1'b1; 
         end
         else begin
             id_bus_o <= id_bus;

@@ -72,6 +72,7 @@ package core;
         logic [31:0] rs2_data;
         logic [31:0] pc;
         bit rf_wr_en;
+        bit pipeline_stall;
     } pipeline_bus_t;
 
     localparam BUS_BITS = $bits(pipeline_bus_t);
@@ -80,7 +81,7 @@ package core;
     localparam ADDR_WIDTH = $clog2(DEPTH);
     localparam DATA_WIDTH =32;
     localparam DATA_BYTES = DATA_WIDTH/8;
-
+    localparam MEM_OP_BITS = $bits(MEM_OP_t);
 
     typedef struct packed {
         bit is_taken;
@@ -95,7 +96,27 @@ package core;
         logic [31:0] w_data;
     } mem_cntrl_bus_t;
     
+    typedef enum logic [1:0] {
+        NONE_STAGE = 2'b00,  
+        MEM_STAGE  = 2'b01,
+        WB_STAGE   = 2'b10
+     } fw_stages_t;
 
+    typedef enum logic [1:0]{
+        RS_NONE = 2'b00,
+        RS1     = 2'b01,
+        RS2     = 2'b10,
+        RS1_RS2 = 2'b11
+    }fw_regs_t;
 
+    typedef struct packed {
+        fw_stages_t stage;
+        fw_regs_t regs;
+    } fw_cntrl_bus_t;
+
+    typedef struct packed {
+        logic [31:0] rs1;
+        logic [31:0] rs2;
+    } bypass_bus_t;
 
 endpackage

@@ -17,3 +17,4 @@
 ../synthesis/mem_signext.sv
 ../synthesis/wb_stage.sv
 ../synthesis/stall_controller.sv
+../synthesis/fw_controller.sv
