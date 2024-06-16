@@ -3,7 +3,8 @@ module memory_unit
     import core::*;
 (
     input core::pipeline_bus_t bus_i,
-    output core::mem_cntrl_bus_t mem_bus
+    output core::mem_cntrl_bus_t mem_bus,
+    input logic [31:0] rs1_in_i
 );
 
     bit is_mem;
@@ -18,12 +19,7 @@ module memory_unit
         mem_bus.w_data = 32'b0;
 
         if(is_mem) begin
-            if(bus_i.mem_op[0] == core::STORE_PRFX) begin
-                mem_bus.addr= bus_i.imm + bus_i.rs1_data;
-            end
-            else begin
-                mem_bus.addr = bus_i.imm + bus_i.rs1_data;
-            end       
+            mem_bus.addr= bus_i.imm + bus_i.rs1_data;
         end
         
     end

@@ -6,6 +6,8 @@ module branch_unit
     input core::pipeline_bus_t bus_i,
     output logic flush_o,
     output core::br_cntrl_bus_t br_bus_o,
+    input logic [31:0] rs1_in_i,
+    input logic [31:0] rs2_in_i,
     output logic [31:0] rd_o
 );
 
@@ -22,22 +24,22 @@ module branch_unit
                 br_bus_o.branch_target = bus_i.pc + bus_i.imm;
                 unique case (bus_i.alu_op)
                     core::ALU_BEQ:begin
-                        br_bus_o.is_taken = bus_i.rs1_data == bus_i.rs2_data;
+                        br_bus_o.is_taken = rs1_in_i == rs2_in_i;
                     end
                     core::ALU_BNE:begin
-                        br_bus_o.is_taken = bus_i.rs1_data != bus_i.rs2_data;
+                        br_bus_o.is_taken = rs1_in_i != rs2_in_i;
                     end
                     core::ALU_BLT:begin
-                        br_bus_o.is_taken = $signed(bus_i.rs1_data) < $signed(bus_i.rs2_data);
+                        br_bus_o.is_taken = $signed(rs1_in_i) < $signed(rs2_in_i);
                     end
                     core::ALU_BGE:begin
-                        br_bus_o.is_taken = $signed(bus_i.rs1_data) >= $signed(bus_i.rs2_data);
+                        br_bus_o.is_taken = $signed(rs1_in_i) >= $signed(rs2_in_i);
                     end
                     core::ALU_BGEU:begin
-                        br_bus_o.is_taken = bus_i.rs1_data > bus_i.rs2_data;
+                        br_bus_o.is_taken = rs1_in_i > rs2_in_i;
                     end
                     core::ALU_BLTU:begin
-                        br_bus_o.is_taken = bus_i.rs1_data < bus_i.rs2_data;
+                        br_bus_o.is_taken = rs1_in_i < rs2_in_i;
                     end
                 endcase
             end
@@ -46,7 +48,7 @@ module branch_unit
                     br_bus_o.is_taken = 1'b1;
                     br_bus_o.branch_target = bus_i.pc + bus_i.imm;
                     rd_o = bus_i.pc + 4;
-                   // $display("Jal target : 0x%h + 0x%h = 0x%h\n",bus_i.rs1_data,bus_i.imm,br_bus_o.branch_target);
+                   // $display("Jal target : 0x%h + 0x%h = 0x%h\n",rs1_in_i,bus_i.imm,br_bus_o.branch_target);
                 //br_bus_o.branch_target[0] = 1'b0;
                 end
                 else begin

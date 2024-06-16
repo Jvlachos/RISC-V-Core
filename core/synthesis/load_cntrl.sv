@@ -23,7 +23,7 @@ module load_cntrl
         mem2se_o.rf_wr_en = bus_i.rf_wr_en;
         mem2se_o.pipeline_stall = bus_i.pipeline_stall;
         
-        if(bus_i.mem_op != core::MEM_NOP && bus_i.mem_op[MEM_OP_BITS-1] == core::LOAD_PRFX)begin
+        if(bus_i.mem_op != core::MEM_NOP )begin
            unique case(bus_i.mem_op)
                 core::LB:begin
                     mem2se_o.rd_res[7:0] = rdata_i [7:0]; 
@@ -40,8 +40,17 @@ module load_cntrl
                 core::LHU:begin
                     mem2se_o.rd_res[15:0] = rdata_i[7:0];
                 end
+                //needed for forwarding (stores)
+                core::SB:begin
+                    mem2se_o.rd_res[7:0] = rdata_i[7:0];
+                end
+                core::SH:begin
+                    mem2se_o.rd_res[15:0] = rdata_i[15:0];
+                end
+                core::SW:begin
+                    mem2se_o.rd_res = rdata_i;
+                end
             endcase 
-        
         end
         else begin 
             mem2se_o.rd_res = bus_i.rd_res;

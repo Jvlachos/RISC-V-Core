@@ -2,7 +2,8 @@ module mem_signext
     import core::*;
 (
     input core::pipeline_bus_t bus_i,
-    output core::pipeline_bus_t bus_o
+    output core::pipeline_bus_t bus_o,
+    output core::bypass_bus_t bp_o
 );
 
     always_comb begin 
@@ -18,11 +19,10 @@ module mem_signext
         bus_o.rs1_data = bus_i.rs1_data;
         bus_o.rs2_data = bus_i.rs2_data;
         bus_o.pc       = bus_i.pc;
-        bus_o.rf_wr_en = bus_i.rf_wr_en;
         bus_o.pipeline_stall = bus_i.pipeline_stall;
     
 
-        if(bus_i.mem_op != core::MEM_NOP && bus_i.mem_op[MEM_OP_BITS-1] == core::LOAD_PRFX) begin
+        if(bus_i.mem_op != core::MEM_NOP && bus_i.mem_op[MEM_OP_BITS-1] == core::LOAD_PRFX) begin //if its a load give the result to wb and bypass
             unique case (bus_i.mem_op)
                 core::LB:begin
                     bus_o.rd_res = {{24{bus_i.rd_res[7]}},bus_i.rd_res[7:0]};
@@ -31,7 +31,7 @@ module mem_signext
                     bus_o.rd_res = {{16{bus_i.rd_res[15]}},bus_i.rd_res[15:0]};
                 end
                 core::LW:begin
-                    ;
+                    bus_o.rd_res = bus_i.rd_res;
                 end
                 core::LBU:begin
                     bus_o.rd_res = {{24{1'b0}},bus_i.rd_res[7:0]};
@@ -40,10 +40,32 @@ module mem_signext
                     bus_o.rd_res = {{16{1'b0}},bus_i.rd_res[15:0]};
                 end
             endcase
+            bus_o.rf_wr_en = 1;
+            bp_o.rd = bus_o.rd_res;
+            bp_o.rd_addr = bus_o.rd;
         end
-        else
+        else if(bus_i.mem_op!= core::MEM_NOP && bus_i.mem_op[MEM_OP_BITS-1] == core::STORE_PRFX) begin //if its a store bypass the sign extended value,don't give it to wbi
+             unique case (bus_i.mem_op)
+                core::SB:begin
+                    bp_o.rd = {{24{bus_i.rd_res[7]}},bus_i.rd_res[7:0]};
+                end
+                core::SH:begin
+                    bp_o.rd = {{16{bus_i.rd_res[15]}},bus_i.rd_res[15:0]};
+                end
+                core::SW:begin
+                    bp_o.rd = bus_i.rd_res;
+                end
+            endcase
+            bp_o.rd_addr = bus_i.rd;
+            bus_o.rf_wr_en = 0;
+        end
+        else begin //if neither pass regular values to bp and wb
             bus_o.rd_res = bus_i.rd_res;
-        
+            bp_o.rd = bus_o.rd_res;
+            bp_o.rd_addr = bus_o.rd;
+            bus_o.rf_wr_en = bus_i.rf_wr_en;
+        end
+
     end
     
 endmodule

@@ -115,8 +115,8 @@ package core;
     } fw_cntrl_bus_t;
 
     typedef struct packed {
-        logic [31:0] rs1;
-        logic [31:0] rs2;
+        logic [4:0]  rd_addr;
+        logic [31:0] rd;
     } bypass_bus_t;
 
 endpackage

@@ -38,23 +38,23 @@ module stall_controller
             ld_rd = exmem_bus_i.rd;
             unique  case(format_i)
                 core::I_FORMAT: begin
-                    stall_o = ld_rd!=0 && ld_rd == instruction.itype.rs1; 
+                    stall_o = ld_rd!='0 && ld_rd == instruction.itype.rs1; 
                 end
                 core::S_FORMAT: begin
-                    stall_o = (ld_rd == instruction.stype.rs1) || (ld_rd == instruction.stype.rs2);
+                    stall_o = ld_rd!='0 && (ld_rd == instruction.stype.rs1 || ld_rd == instruction.stype.rs2);
                 end
                 core::U_FORMAT: begin
                     ;
                 end
                 core::R_FORMAT: begin
-                    stall_o = (ld_rd == instruction.rtype.rs1) || (ld_rd == instruction.rtype.rs2);
+                    stall_o = ld_rd!='0 && (ld_rd == instruction.rtype.rs1 || ld_rd == instruction.rtype.rs2);
                 end
                 core::B_FORMAT: begin
-                    stall_o = (ld_rd == instruction.btype.rs1) || (ld_rd == instruction.btype.rs2);
+                    stall_o = ld_rd!='0 && (ld_rd == instruction.btype.rs1 || ld_rd == instruction.btype.rs2);
                 end
                 core::J_FORMAT: begin
                     if(instruction.instruction[6:0] == core::ALU_JALR) begin
-                        stall_o = ld_rd == instruction.itype.rs1;
+                        stall_o = ld_rd!='0 && ld_rd == instruction.itype.rs1;
                     end
                     else begin
                         ;

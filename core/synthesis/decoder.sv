@@ -57,7 +57,7 @@ module decoder
             id_bus_o.format = core::I_FORMAT;
             id_bus_o.rs1    = instruction.itype.rs1;
             id_bus_o.rd     = instruction.itype.rd;
-            if(instruction.itype.rs1 == 5'b0 &&  instruction.itype.rd == 5'b0 && instruction.itype.imm ==0 )
+            if(instruction.itype.rs1 == 5'b0 &&  instruction.itype.rd == 5'b0 && instruction.itype.imm =='0 )
                      id_bus_o.alu_op = core::ALU_NOP;
             else begin
                id_bus_o.alu_op = core::ALU_OP_t'({core::ARITHM_PRFX,instruction.itype.funct3});

@@ -22,8 +22,11 @@ module fw_controller
         rd_ex  = ex_bus_i.rd;
         rd_mem = mem_bus_i.rd;
 
-        fw_from_mem = (rd_ex != '0) && ((rs1_id == rd_ex) || (rs2_id == rd_ex));
-        fw_from_wb  = (rd_mem!= '0) && ((rs1_id == rd_mem)|| (rs2_id == rd_mem));
+        fw_from_mem = (rd_ex != '0) && ((rs1_id == rd_ex) || (rs2_id == rd_ex)) 
+        && ex_bus_i.rf_wr_en && ex_bus_i.mem_op[MEM_OP_BITS-1] != core::LOAD_PRFX; 
+        
+        fw_from_wb  = (rd_mem!= '0) && ((rs1_id == rd_mem)|| (rs2_id == rd_mem))
+        && mem_bus_i.rf_wr_en&& mem_bus_i.mem_op[MEM_OP_BITS-1]!= core::LOAD_PRFX;
 
         fw_cntrl.stage = ~fw_from_mem & ~fw_from_wb ? core::NONE_STAGE :
         fw_from_mem ? core::MEM_STAGE : core::WB_STAGE;

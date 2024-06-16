@@ -6,11 +6,12 @@ module mem_stage
    input logic rst,
    input core::pipeline_bus_t bus_i,
    input core::mem_cntrl_bus_t mem_cntrl_i,
-   output core::pipeline_bus_t mem_bus_o
+   output core::pipeline_bus_t mem_bus_o,
+   output core::bypass_bus_t mem_bp_o
 );
 
     logic [31:0] rdata;    
-
+  
     core::mem_cntrl_bus_t store_cntrl;
     core::mem_cntrl_bus_t load_cntrl;
     core::pipeline_bus_t mem2se;
@@ -30,7 +31,8 @@ module mem_stage
 
     mem_signext mem_signext_inst(
         .bus_i(bus_i),
-        .bus_o(mem2wb));
+        .bus_o(mem2wb),
+        .bp_o(mem_bp_o));
 
 
     mem_sync_sp_rvdmem #

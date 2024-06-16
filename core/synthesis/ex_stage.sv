@@ -21,21 +21,36 @@ module ex_stage
     assign curr_bypass = fw_cntrl_i.stage == core::MEM_STAGE ? mem_bypass_i :
     fw_cntrl_i.stage == core::WB_STAGE ? wb_bypass_i : '0;
     logic [31:0] rd_branch; 
+    logic [31:0] rs1_in;
+    logic [31:0] rs2_in;
 
     memory_unit mem_unit_instance(
         .bus_i(bus_i),
-        .mem_bus(ex2mem));
+        .mem_bus(ex2mem),
+        .rs1_in_i(rs1_in));
+
+    ex_fw_sel fw_sel(
+        .bus_i(bus_i),
+        .fw_cntrl_i(fw_cntrl_i),
+        .bypass_i(curr_bypass),
+        .rs1_in_o(rs1_in),
+        .rs2_in_o(rs2_in));
 
     alu alu_instance(
      .clk(clk),
      .alu_bus_i(bus_i),
-     .alu_bus_o(ex_bus));
+     .alu_bus_o(ex_bus),
+     .rs1_in_i(rs1_in),
+     .rs2_in_i(rs2_in));
+
 
 
     branch_unit branch_unit_instance(
         .bus_i(bus_i),
         .flush_o(flush_o),
         .br_bus_o(br_bus_o),
+        .rs1_in_i(rs1_in),
+        .rs2_in_i(rs2_in),
         .rd_o(rd_branch));
 
 

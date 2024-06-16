@@ -89,14 +89,16 @@ module core_top;
         .rst(rst),
         .bus_i(ex_bus),
         .mem_cntrl_i(mem_cntrl),
-        .mem_bus_o(mem_bus));
+        .mem_bus_o(mem_bus),
+        .mem_bp_o(mem_bypass));
 
     wb_stage wb_s(
         .clk(clk),
         .rst(rst),
         .bus_i(mem_bus),
         .wb_bus_o(wb_bus),
-        .unstall_o(unstall));
+        .unstall_o(unstall),
+        .wb_bp_o(wb_bypass));
 
     integer i_index; 
 
