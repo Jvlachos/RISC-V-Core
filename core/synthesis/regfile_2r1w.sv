@@ -27,6 +27,10 @@ assign wen = i_wen & ~(i_waddr == 0);
 
 always @(posedge clk) begin
     if ( wen ) begin
+        assert(i_waddr != '0) else begin
+          $display("WRITE TO X0!\n");
+          $finish;
+        end
        rf[i_waddr] <= i_wdata;
     end
 end
