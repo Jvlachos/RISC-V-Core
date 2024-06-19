@@ -142,7 +142,9 @@ module decoder
             id_bus_o.rf_wr_en = 1'b1;
          end
          riscv::E_OP: begin; end
-         default: $display("Illegal Instruction!/NOP");
+         default: begin $display("Illegal Instruction!/NOP : %b\n",instruction_i);
+            
+         end
       endcase
    end
 

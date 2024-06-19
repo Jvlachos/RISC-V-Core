@@ -21,7 +21,7 @@ module ex_fw_sel
             end
             if(fw_cntrl_i.regs == core::RS1) begin
                 rs1_in_o = bypass_i.rd;
-                rs2_in_o = bus_i.rs1_data;
+                rs2_in_o = bus_i.rs2_data;
             end
             else if(fw_cntrl_i.regs == core::RS2) begin
                 rs1_in_o = bus_i.rs1_data;

@@ -112,7 +112,7 @@ module core_top;
         @(posedge clk);
 
         rst = 1;
-        repeat(10) begin
+        repeat(45) begin
            // pc_incr = 1;
             #5;
 //            instruction = db_i_mem[i_index];
@@ -139,10 +139,10 @@ module core_top;
     task display_bus(pipeline_bus_t curr_bus,string msg);
         $display("Cycle : %0d Stage : %s\n",cycle_no,msg);
         riscv::decode_instr(curr_bus.instr);
-        $display("\nMemOp: %s\nAluOp: %s\nFormat: %s\nImm: %d\nRs1: %d\nRs2: %d\nRd: %d\nPc: 0x%h\nRs1 data: 0x%h\nRs2 data: 0x%h\nRd data: 0x%d\nRF: %0b\n",
+        $display("\nMemOp: %s\nAluOp: %s\nFormat: %s\nImm: %d\nRs1: %d\nRs2: %d\nRd: %d\nPc: 0x%h\nRs1 data: 0x%h\nRs2 data: 0x%h\nRd data: 0x%d\nRF: %0b\nBR: 0x%h\n",
         curr_bus.mem_op.name(),curr_bus.alu_op.name(),
         curr_bus.format.name(),$signed(curr_bus.imm),curr_bus.rs1,curr_bus.rs2,curr_bus.rd,curr_bus.pc,
-        curr_bus.rs1_data,curr_bus.rs2_data,$signed(curr_bus.rd_res),curr_bus.rf_wr_en);
+        curr_bus.rs1_data,curr_bus.rs2_data,$signed(curr_bus.rd_res),curr_bus.rf_wr_en,br_bus.branch_target);
     endtask
 
     task display_side();

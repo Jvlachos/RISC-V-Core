@@ -54,7 +54,7 @@ module branch_unit
                 else begin
                     br_bus_o.is_taken = 1'b1;
                     rd_o = bus_i.pc + 4;
-                    br_bus_o.branch_target = bus_i.pc + bus_i.imm;
+                    br_bus_o.branch_target = rs1_in_i + bus_i.imm;
                     br_bus_o.branch_target[0] = 1'b0;
                 end
                 
