@@ -12,8 +12,8 @@ module imm_generator
 
     assign format =  core::formats_t'(format_i);
     always_comb begin : imm_mux
-        imm_o = 32'b0;
-        //$display("FORMAT %s\n",format.name);
+        //imm_o = 32'b0;
+       $display("FORMAT %s\n",format.name);
         unique case (format)
             core::I_FORMAT: begin
                 if(instruction.itype.funct3 == riscv::SRLI_SRAI || instruction.itype.funct3 == riscv::SLLI_F3) begin
@@ -22,9 +22,7 @@ module imm_generator
                 else begin
                     imm_o = {{21{instr_i[31]}},instr_i[30:20]};
                 end
-              
-               //$display("instruction in add %b\n",instr_i);
-                //$display("immediate add : %d\n",imm_o);
+                         
 
             end
             core::R_FORMAT: begin
@@ -56,7 +54,7 @@ module imm_generator
             end
             core::B_FORMAT:begin
                 imm_o ={ {19{instr_i[31]}},{instr_i[31],instr_i[7],instr_i[30:25],instr_i[11:8],1'b0}};
-                $display("B Imm : %b , %d",imm_o,imm_o);
+      //          $display("B Imm : %b , %d",imm_o,imm_o);
             end 
             default: begin
                  imm_o = 32'b0;

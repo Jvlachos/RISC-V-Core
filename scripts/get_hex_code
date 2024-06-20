@@ -2,6 +2,9 @@
 cd  ../../../code/"$1" &&
 source ../rv32i-settings.sh &&
 make clean && make &&
-cp "$1".imem.dat ../../project/RISC-V-Core/code/ihex/code.hex && make clean
+cp "$1".imem.dat  ../../project/RISC-V-Core/code/ihex/code.hex 
+cp "$1".dmem.dat ../../project/RISC-V-Core/code/ihex/codemem.hex 
+
+
 echo done!
 

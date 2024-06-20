@@ -64,7 +64,6 @@ module stall_controller
                     ;
                 end
             endcase
-            $display("STALL : %0b\n",stall_o);
         end
         else begin
             ;

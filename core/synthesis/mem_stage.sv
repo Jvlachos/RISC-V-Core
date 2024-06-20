@@ -37,11 +37,11 @@ module mem_stage
 
     mem_sync_sp_rvdmem #
     (.DATA_WIDTH(core::DATA_WIDTH),
-    .INIT_ZERO(1))
+    .INIT_FILE("/home/dvlachos/project/RISC-V-Core/code/ihex/codemem.hex"))
     memory_instance(
         .clk(clk),
         .i_addr(mem_cntrl_i.addr),
-        .i_wdata(bus_i.rs2_data),
+        .i_wdata(store_cntrl.w_data),
         .i_wen(store_cntrl.write_en),
         .o_rdata(rdata)
     );

@@ -16,10 +16,7 @@ module ex_stage
     bit pipeline_stalled;
     core::pipeline_bus_t ex_bus;
     core::mem_cntrl_bus_t ex2mem;
-    core::bypass_bus_t curr_bypass;
-
-    assign curr_bypass = fw_cntrl_i.stage == core::MEM_STAGE ? mem_bypass_i :
-    fw_cntrl_i.stage == core::WB_STAGE ? wb_bypass_i : '0;
+   
     logic [31:0] rd_branch; 
     logic [31:0] rs1_in;
     logic [31:0] rs2_in;
@@ -27,12 +24,14 @@ module ex_stage
     memory_unit mem_unit_instance(
         .bus_i(bus_i),
         .mem_bus(ex2mem),
-        .rs1_in_i(rs1_in));
+        .rs1_in_i(rs1_in),
+        .rs2_in_i(rs2_in));
 
     ex_fw_sel fw_sel(
         .bus_i(bus_i),
         .fw_cntrl_i(fw_cntrl_i),
-        .bypass_i(curr_bypass),
+        .mem_bypass_i(mem_bypass_i),
+        .wb_bypass_i(wb_bypass_i),
         .rs1_in_o(rs1_in),
         .rs2_in_o(rs2_in));
 

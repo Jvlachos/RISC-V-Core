@@ -13,12 +13,14 @@ module store_cntrl
         store_cntrl_o.w_data = mem_cntrl_i.w_data;
         store_cntrl_o.write_en = '0;
         if(bus_i.mem_op != core::MEM_NOP && bus_i.mem_op[MEM_OP_BITS-1] == core::STORE_PRFX) begin
+            $display("STORE DATA : %0d\n",mem_cntrl_i.w_data);
             unique case(bus_i.mem_op)
                 core::SB:begin
-                    store_cntrl_o.write_en = 4'b0001;
+                    store_cntrl_o.write_en[mem_cntrl_i.addr[1:0]+:1] = 1'b1;
+            
                 end
                 core::SH:begin
-                    store_cntrl_o.write_en = 4'b0011;
+                    store_cntrl_o.write_en[mem_cntrl_i.addr[1:0]+:2] = 2'b11;
                 end
                 core::SW:begin
                     store_cntrl_o.write_en = 4'b1111;
