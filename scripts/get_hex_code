@@ -1,10 +1,22 @@
 #! /bin/bash
+EX1="example1"
+EX2="fib"
+EX3="coremark"
+
+src=""
+
+if [ $1 = "example1"]; then
+    src=$EX1
+elif [ $1 = "example2" ]; then
+    src=$EX2
+elif [ $1 = "example3" ]; then
+    src=$EX3
+fi
+
 cd  ../../../code/"$1" &&
 source ../rv32i-settings.sh &&
 make clean && make &&
-cp "$1".imem.dat  ../../project/RISC-V-Core/code/ihex/code.hex 
-cp "$1".dmem.dat ../../project/RISC-V-Core/code/ihex/codemem.hex 
-
+cp "$src".imem.dat  ../../project/RISC-V-Core/code/ihex/code.hex 
+cp "$src".dmem.dat ../../project/RISC-V-Core/code/ihex/codemem.hex 
 
 echo done!
-

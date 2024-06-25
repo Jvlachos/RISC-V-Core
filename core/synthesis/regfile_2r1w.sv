@@ -26,7 +26,10 @@ logic wen;
 assign wen = i_wen & ~(i_waddr == 0);
 
 always @(posedge clk) begin
-    if ( wen ) begin
+ //     for(int i = 0; i <32; i++) begin
+   //     $display("REG %0d\n DATA %0d\n",i,rf[i]);
+     // end
+      if ( wen ) begin
         assert(i_waddr != '0) else begin
           $display("WRITE TO X0!\n");
           $finish;

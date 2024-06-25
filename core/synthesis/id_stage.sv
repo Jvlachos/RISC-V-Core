@@ -50,6 +50,7 @@ module id_stage
             id_bus_o.format <= core::NOP;
             id_bus_o.instr  <= riscv::I_NOP;
             id_bus_o.pipeline_stall <= 1'b1; 
+            //id_bus_o.rd_res = '0;
         end
         else begin
             id_bus_o <= id_bus;

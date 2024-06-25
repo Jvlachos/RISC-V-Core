@@ -13,7 +13,6 @@ module imm_generator
     assign format =  core::formats_t'(format_i);
     always_comb begin : imm_mux
         //imm_o = 32'b0;
-       $display("FORMAT %s\n",format.name);
         unique case (format)
             core::I_FORMAT: begin
                 if(instruction.itype.funct3 == riscv::SRLI_SRAI || instruction.itype.funct3 == riscv::SLLI_F3) begin

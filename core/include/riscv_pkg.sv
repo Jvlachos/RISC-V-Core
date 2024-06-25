@@ -15,7 +15,38 @@ package riscv;
 
 
     typedef enum logic [4:0] {
-        x[0:31]
+        zero = 0,
+        ra,
+        sp,
+        gp,
+        tp,
+        t0,
+        t1,
+        t2,
+        s0,
+        s1,
+        a0,
+        a1,
+        a2,
+        a3,
+        a4,
+        a5,
+        a6,
+        a7,
+        s2,
+        s3,
+        s4,
+        s5,
+        s6,
+        s7,
+        s8,
+        s9,
+        s10,
+        s11,
+        t3,
+        t4,
+        t5,
+        t6
     } reg_t;
 
     typedef struct packed {
@@ -315,8 +346,8 @@ package riscv;
             end
             riscv::RR_OP: begin;
                 rs1_t = riscv::reg_t'(instruction.rtype.rs1);
-                rd_t  = riscv::reg_t'(instruction.rtype.rs2);
-                rs2_t  = riscv::reg_t'(instruction.rtype.rd);
+                rd_t  = riscv::reg_t'(instruction.rtype.rd);
+                rs2_t  = riscv::reg_t'(instruction.rtype.rs2);
                 unique case(instruction.rtype.funct3) 
                 riscv::ADD_SUB: begin;
                     case(instruction.rtype.funct7)

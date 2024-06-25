@@ -6,7 +6,8 @@ module alu
     input core::pipeline_bus_t alu_bus_i,
     input logic [31:0] rs1_in_i,
     input logic [31:0] rs2_in_i,
-    output core::pipeline_bus_t alu_bus_o
+    output core::pipeline_bus_t alu_bus_o,
+    output logic [31:0] ld_addr
 );
     bit is_mem;
     assign is_mem = ~alu_bus_i.is_branch && alu_bus_i.alu_op == core::ALU_NOP && alu_bus_i.mem_op != core::MEM_NOP;
@@ -25,17 +26,19 @@ module alu
         alu_bus_o.pipeline_stall = alu_bus_i.pipeline_stall;
         alu_bus_o.rd_res = 32'b0;
         alu_bus_o.rf_wr_en = alu_bus_i.rf_wr_en;
-        
+        alu_bus_o.mem_addr ='0;
+        alu_bus_o.mem_w_data = '0;
         alu_bus_o.rs1_data = rs1_in_i;
         alu_bus_o.rs2_data = rs2_in_i;
-
+        alu_bus_o.mem_w_en = '0;
+        ld_addr = '0;
         if(~alu_bus_i.is_branch & ~is_mem) begin
-            $display("FORMAT :%s\n",alu_bus_i.format.name());
             unique case(alu_bus_i.alu_op) 
                 core::ALU_ADD: begin
                     unique case(alu_bus_i.format)
                         core::I_FORMAT: begin
                             alu_bus_o.rd_res = rs1_in_i + alu_bus_i.imm;
+                            
                         end
                         core::R_FORMAT: begin
                             if(alu_bus_i.instr[`ADD_SUB_BIT])
@@ -82,10 +85,10 @@ module alu
                 core::ALU_SLL: begin
                     unique case(alu_bus_i.format)
                         core::I_FORMAT: begin
-                            alu_bus_o.rd_res = rs1_in_i << alu_bus_i.imm;          
+                            alu_bus_o.rd_res = rs1_in_i << alu_bus_i.imm[4:0];          
                         end
                         core::R_FORMAT: begin
-                            alu_bus_o.rd_res = rs1_in_i << rs2_in_i;
+                            alu_bus_o.rd_res = rs1_in_i << rs2_in_i[4:0];
                         end
                     endcase
                 end
@@ -93,10 +96,10 @@ module alu
                 core::ALU_SLT: begin
                     unique case(alu_bus_i.format)
                         core::I_FORMAT: begin
-                            alu_bus_o.rd_res = $signed(rs1_in_i) < $signed(alu_bus_i.imm); 
+                            alu_bus_o.rd_res[0] = $signed(rs1_in_i) < $signed(alu_bus_i.imm); 
                         end
                         core::R_FORMAT: begin
-                            alu_bus_o.rd_res = $signed(rs1_in_i) < $signed(rs2_in_i);
+                            alu_bus_o.rd_res[0] = $signed(rs1_in_i) < $signed(rs2_in_i);
                         end
                     endcase
                 end
@@ -115,16 +118,16 @@ module alu
                 core::ALU_SRA_SRL :begin
                     unique case(alu_bus_i.format)
                         core::I_FORMAT: begin
-                            if(alu_bus_i.instr[`SRA_SRL_bit])
-                                alu_bus_o.rd_res = rs1_in_i >> alu_bus_i.imm;
+                            if(~alu_bus_i.instr[`SRA_SRL_bit])
+                                alu_bus_o.rd_res = rs1_in_i >> alu_bus_i.imm[4:0];
                             else 
-                                alu_bus_o.rd_res = rs1_in_i >>> alu_bus_i.imm;          
+                                alu_bus_o.rd_res = $signed(rs1_in_i) >>> alu_bus_i.imm[4:0];          
                         end
                         core::R_FORMAT: begin
-                            if(alu_bus_i.instr[`SRA_SRL_bit])
-                                alu_bus_o.rd_res = rs1_in_i >> rs2_in_i;
+                            if(~alu_bus_i.instr[`SRA_SRL_bit])
+                                alu_bus_o.rd_res = rs1_in_i >> rs2_in_i[4:0];
                             else
-                                alu_bus_o.rd_res = rs1_in_i >>> rs2_in_i;
+                                alu_bus_o.rd_res = $signed(rs1_in_i) >>> rs2_in_i[4:0];
                         end
                     endcase                    
                 end
@@ -152,6 +155,16 @@ module alu
                 end
                 default: $display("Illegal insts?");
             endcase
+            //alu_bus_o.rd_res = 32'(signed'(alu_bus_o.rd_res));
+        end
+        else if(is_mem) begin
+            alu_bus_o.mem_addr = alu_bus_i.imm + rs1_in_i;
+            
+            if(alu_bus_i.mem_op[MEM_OP_BITS-1] == core::STORE_PRFX)
+               alu_bus_o.mem_w_data = rs2_in_i;
+            else begin
+                ld_addr = alu_bus_o.mem_addr; //fw addr to mem_stage 
+            end
         end
         
 

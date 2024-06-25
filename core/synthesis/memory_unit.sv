@@ -18,14 +18,17 @@ module memory_unit
         mem_bus.addr   = 32'b0;
         mem_bus.r_data = 32'b0;
         mem_bus.w_data = 32'b0;
-
+        
         if(is_mem) begin
             mem_bus.addr= bus_i.imm + rs1_in_i;
+            $display("R1 : %0d + IMM : %0d = %0d\n",rs1_in_i,bus_i.imm,mem_bus.addr);
             if(bus_i.mem_op[MEM_OP_BITS-1] == core::STORE_PRFX)
                 mem_bus.w_data = rs2_in_i;
             else 
                 ;
         end
+        else
+            ;
         
     end
     

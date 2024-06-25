@@ -3,9 +3,9 @@ module load_cntrl
     import core::*;
 (
     input core::pipeline_bus_t bus_i,
-    input core::mem_cntrl_bus_t mem_cntrl_i,
     input logic [31:0] rdata_i,
-    output core::pipeline_bus_t mem2se_o
+    output core::pipeline_bus_t mem2se_o,
+    input logic [31:0] addr
 );
     always_comb begin
         mem2se_o.mem_op = bus_i.mem_op;
@@ -22,26 +22,54 @@ module load_cntrl
         mem2se_o.pc       = bus_i.pc;
         mem2se_o.rf_wr_en = bus_i.rf_wr_en;
         mem2se_o.pipeline_stall = bus_i.pipeline_stall;
-        
-        if(bus_i.mem_op != core::MEM_NOP )begin
+        mem2se_o.rd_res = 32'b0;
+        if(bus_i.mem_op != core::MEM_NOP && bus_i.mem_op[MEM_OP_BITS-1] == core::LOAD_PRFX )begin
+            $display("RD_DATA :0x%0h\n",rdata_i);
            unique case(bus_i.mem_op)
                 core::LB:begin
-                    mem2se_o.rd_res[7:0] = rdata_i [7:0]; 
+                    mem2se_o.rd_res[7:0] = rdata_i[addr[1:0]*8+:8]; 
                 end
                 core::LH:begin
-                    mem2se_o.rd_res[15:0] = rdata_i[15:0];
+                    //mem2se_o.rd_res[15:0] = rdata_i[addr[1:0]*8+:16];
+                    case(addr[1:0])
+                        2'b00: begin
+                            mem2se_o.rd_res[15:0] = rdata_i[15:0];
+                        end
+                        2'b01: begin
+                            mem2se_o.rd_res[15:0] = rdata_i[23:8];
+                        end
+                        2'b10: begin
+                            mem2se_o.rd_res[15:0] = rdata_i[31:16];
+                        end
+                        default: begin
+                            ;
+                        end
+                    endcase
                 end
                 core::LW:begin
-                    mem2se_o.rd_res = rdata_i;
+                    mem2se_o.rd_res[31:0] = rdata_i[31:0];
                 end
                 core::LBU:begin
-                    mem2se_o.rd_res [7:0] = rdata_i[7:0];
+                    mem2se_o.rd_res [7:0] = rdata_i[addr[1:0]*8+:8]; 
                 end
                 core::LHU:begin
-                    mem2se_o.rd_res[15:0] = rdata_i[7:0];
+                     case(addr[1:0])
+                        2'b00: begin
+                            mem2se_o.rd_res[15:0] = rdata_i[15:0];
+                        end
+                        2'b01: begin
+                            mem2se_o.rd_res[15:0] = rdata_i[23:8];
+                        end
+                        2'b10: begin
+                            mem2se_o.rd_res[15:0] = rdata_i[31:16];
+                        end
+                        default: begin
+                            ;
+                        end
+                    endcase
                 end
                 //needed for forwarding (stores)
-                core::SB:begin
+                /*core::SB:begin
                     mem2se_o.rd_res[7:0] = rdata_i[7:0];
                 end
                 core::SH:begin
@@ -50,6 +78,7 @@ module load_cntrl
                 core::SW:begin
                     mem2se_o.rd_res = rdata_i;
                 end
+                */
             endcase 
         end
         else begin 

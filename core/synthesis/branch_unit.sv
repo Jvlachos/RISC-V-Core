@@ -27,6 +27,7 @@ module branch_unit
                         br_bus_o.is_taken = rs1_in_i == rs2_in_i;
                     end
                     core::ALU_BNE:begin
+                        $display("%0d\n != %0d\n",rs1_in_i,rs2_in_i);
                         br_bus_o.is_taken = rs1_in_i != rs2_in_i;
                     end
                     core::ALU_BLT:begin
@@ -36,7 +37,7 @@ module branch_unit
                         br_bus_o.is_taken = $signed(rs1_in_i) >= $signed(rs2_in_i);
                     end
                     core::ALU_BGEU:begin
-                        br_bus_o.is_taken = rs1_in_i > rs2_in_i;
+                        br_bus_o.is_taken = rs1_in_i >= rs2_in_i;
                     end
                     core::ALU_BLTU:begin
                         br_bus_o.is_taken = rs1_in_i < rs2_in_i;

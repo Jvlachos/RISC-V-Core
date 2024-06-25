@@ -30,6 +30,11 @@ module core_top;
     core::fw_cntrl_bus_t fw_cntrl;
     core::bypass_bus_t mem_bypass;
     core::bypass_bus_t wb_bypass;
+    core::bypass_bus_t wb_bp_late;
+    core::pipeline_bus_t wb_late;    
+    logic [31:0] ld_addr;
+    core::MEM_OP_t exmemop;
+    assign exmemop = id_bus.mem_op;
 
     fw_controller fw_control(
         .clk(clk),
@@ -37,6 +42,8 @@ module core_top;
         .id_bus_i(id2fw),
         .ex_bus_i(id_bus),
         .mem_bus_i(ex_bus),
+        .wb_bus_i(wb_bus),
+        .wb_late_bus_i(wb_late),
         .fw_cntrl_o(fw_cntrl));    
 
     stall_controller stall_cntrl(
@@ -79,10 +86,12 @@ module core_top;
         .fw_cntrl_i(fw_cntrl),
         .mem_bypass_i(mem_bypass),
         .wb_bypass_i(wb_bypass),
+        .wb_late_bypass_i(wb_bp_late),
         .ex_bus_o(ex_bus),
         .flush_o(pipeline_flush),
         .br_bus_o(br_bus),
-        .ex2mem_o(mem_cntrl));
+        .ex2mem_o(mem_cntrl),
+        .ld_addr(ld_addr));
 
     mem_stage mem_s(
         .clk(clk),
@@ -90,7 +99,9 @@ module core_top;
         .bus_i(ex_bus),
         .mem_cntrl_i(mem_cntrl),
         .mem_bus_o(mem_bus),
-        .mem_bp_o(mem_bypass));
+        .mem_bp_o(mem_bypass),
+        .ld_addr(ld_addr),
+        .exmemop(exmemop));
 
     wb_stage wb_s(
         .clk(clk),
@@ -98,7 +109,9 @@ module core_top;
         .bus_i(mem_bus),
         .wb_bus_o(wb_bus),
         .unstall_o(unstall),
-        .wb_bp_o(wb_bypass));
+        .wb_bp_o(wb_bypass),
+        .wb_late_o(wb_late),
+        .wb_bp_late_o(wb_bp_late));
 
     integer i_index; 
 
@@ -112,18 +125,19 @@ module core_top;
         @(posedge clk);
 
         rst = 1;
-        repeat(100) begin
+        while(1) begin
+            
            // pc_incr = 1;
 //            instruction = db_i_mem[i_index];
             @(posedge clk);
 //            cycle_no ++;
             //pc_incr = 0;
-            #5;
+           // #5;
             //display_side();
             display_bus(id_bus,"ID/EX");
             display_bus(ex_bus,"EX/MEM");
             display_bus(mem_bus,"MEM/WB");
-            display_bus(wb_bus,"WB/ALL");
+            display_bus(wb_late,"WB/ALL");
             $display("\n ---------------------------------------------------- \n");
             i_index++;
         end
@@ -132,15 +146,17 @@ module core_top;
 
     always @(posedge clk) begin
         cycle_no <= cycle_no + 1;
+        //if(cycle_no > 1000)
+          //  $finish;
     end
 
     task display_bus(pipeline_bus_t curr_bus,string msg);
         $display("Cycle : %0d Stage : %s\n",cycle_no,msg);
         riscv::decode_instr(curr_bus.instr);
-        $display("\nMemOp: %s\nAluOp: %s\nFormat: %s\nImm: %d\nRs1: %d\nRs2: %d\nRd: %d\nPc: 0x%h\nRs1 data: 0x%h\nRs2 data: 0x%h\nRd data: 0x%0h\nRF: %0b\nBR: 0x%h\nST: 0x%0h\n",
+        $display("\nMemOp: %s\nAluOp: %s\nFormat: %s\nImm: %d\nRs1: %d\nRs2: %d\nRd: %d\nPc: 0x%h\nRs1 data: %0d\nRs2 data: %0d\nRd data: %0d\nRF: %0b\nBR: 0x%h\nST: 0x%0h\n",
         curr_bus.mem_op.name(),curr_bus.alu_op.name(),
         curr_bus.format.name(),$signed(curr_bus.imm),curr_bus.rs1,curr_bus.rs2,curr_bus.rd,curr_bus.pc,
-        curr_bus.rs1_data,curr_bus.rs2_data,$signed(curr_bus.rd_res),curr_bus.rf_wr_en,br_bus.branch_target,mem_cntrl.w_data);
+        $signed(curr_bus.rs1_data),$signed(curr_bus.rs2_data),$signed(curr_bus.rd_res),curr_bus.rf_wr_en,br_bus.branch_target,mem_cntrl.w_data);
     endtask
 
     task display_side();

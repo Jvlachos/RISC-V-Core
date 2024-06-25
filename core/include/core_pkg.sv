@@ -57,6 +57,15 @@ package core;
     } MEM_OP_t;
 
 
+    localparam BUS_DYN_BITS = $bits(MEM_OP_t) + $bits(ALU_OP_t) + $bits(formats_t);
+    localparam DEPTH = 4096 ;
+    localparam ADDR_WIDTH = $clog2(DEPTH);
+    localparam DATA_WIDTH =32;
+    localparam DATA_BYTES = DATA_WIDTH/8;
+    localparam MEM_OP_BITS = $bits(MEM_OP_t);
+
+
+
     typedef struct packed {
         MEM_OP_t mem_op;
         ALU_OP_t alu_op;
@@ -71,18 +80,14 @@ package core;
         logic [31:0] rs1_data;
         logic [31:0] rs2_data;
         logic [31:0] pc;
+        logic [31:0] mem_addr;
+        logic [31:0] mem_w_data;
+        logic [DATA_BYTES-1:0] mem_w_en;
         bit rf_wr_en;
         bit pipeline_stall;
     } pipeline_bus_t;
 
     localparam BUS_BITS = $bits(pipeline_bus_t);
-    localparam BUS_DYN_BITS = $bits(MEM_OP_t) + $bits(ALU_OP_t) + $bits(formats_t);
-    localparam DEPTH = 4096 ;
-    localparam ADDR_WIDTH = $clog2(DEPTH);
-    localparam DATA_WIDTH =32;
-    localparam DATA_BYTES = DATA_WIDTH/8;
-    localparam MEM_OP_BITS = $bits(MEM_OP_t);
-
     typedef struct packed {
         bit is_taken;
         logic [31:0] branch_target;
@@ -100,7 +105,7 @@ package core;
         NONE_STAGE = 2'b00,  
         MEM_STAGE  = 2'b01,
         WB_STAGE   = 2'b10,
-        MW_STAGES  = 2'b11
+        WBLATE_STAGE  = 2'b11
      } fw_stages_t;
 
     typedef enum logic [1:0]{
@@ -115,6 +120,8 @@ package core;
         fw_regs_t regs;
         fw_stages_t rs1;
         fw_stages_t rs2;
+        logic [4:0] rs1_addr;
+        logic [4:0] rs2_addr;
     } fw_cntrl_bus_t;
 
     typedef struct packed {

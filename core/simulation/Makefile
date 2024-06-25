@@ -7,7 +7,7 @@ comp:
 	vcs -sverilog -f tb.f  -kdb core_top.sv  -debug_all  -l comp.log
 
 run:
-	./simv -l sim.log
+	./simv -l sim.log > log && cat log
 
 run-dve:
 	./simv -gui -l sim.log

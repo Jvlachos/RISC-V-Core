@@ -20,24 +20,28 @@ module mem_signext
         bus_o.rs2_data = bus_i.rs2_data;
         bus_o.pc       = bus_i.pc;
         bus_o.pipeline_stall = bus_i.pipeline_stall;
-    
-
-        if(bus_i.mem_op != core::MEM_NOP && bus_i.mem_op[MEM_OP_BITS-1] == core::LOAD_PRFX) begin //if its a load give the result to wb and bypass
+        bus_o.rd_res = 32'b0;
+        bp_o.rd = 32'b0;
+        bp_o.rd_addr = 32'b0;
+        if(bus_i.mem_op != core::MEM_NOP && bus_i.mem_op[MEM_OP_BITS-1] == core::LOAD_PRFX) begin
+            $display("MEMSE :0x%0h\n",bus_i.rd_res); //if its a load give the result to wb and bypass
             unique case (bus_i.mem_op)
                 core::LB:begin
                     bus_o.rd_res = {{24{bus_i.rd_res[7]}},bus_i.rd_res[7:0]};
+                    $display("MEMSE bus_o RD:0x%0h\n",bus_o.rd_res); 
                 end
                 core::LH:begin
+                    $display("MEMSE bus_o RD:0x%0h\n",bus_o.rd_res); 
                     bus_o.rd_res = {{16{bus_i.rd_res[15]}},bus_i.rd_res[15:0]};
                 end
                 core::LW:begin
                     bus_o.rd_res = bus_i.rd_res;
                 end
                 core::LBU:begin
-                    bus_o.rd_res = {{24{1'b0}},bus_i.rd_res[7:0]};
+                    bus_o.rd_res = {24'b0,bus_i.rd_res[7:0]};
                 end
                 core::LHU:begin
-                    bus_o.rd_res = {{16{1'b0}},bus_i.rd_res[15:0]};
+                    bus_o.rd_res = {16'b0,bus_i.rd_res[15:0]};
                 end
             endcase
             bus_o.rf_wr_en = 1;
@@ -45,17 +49,6 @@ module mem_signext
             bp_o.rd_addr = bus_o.rd;
         end
         else if(bus_i.mem_op!= core::MEM_NOP && bus_i.mem_op[MEM_OP_BITS-1] == core::STORE_PRFX) begin //if its a store bypass the sign extended value,don't give it to wbi
-             unique case (bus_i.mem_op)
-                core::SB:begin
-                    bp_o.rd = {{24{bus_i.rd_res[7]}},bus_i.rd_res[7:0]};
-                end
-                core::SH:begin
-                    bp_o.rd = {{16{bus_i.rd_res[15]}},bus_i.rd_res[15:0]};
-                end
-                core::SW:begin
-                    bp_o.rd = bus_i.rd_res;
-                end
-            endcase
             bp_o.rd_addr = bus_i.rd;
             bus_o.rf_wr_en = 0;
         end

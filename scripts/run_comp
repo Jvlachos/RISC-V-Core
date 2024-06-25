@@ -1,0 +1,38 @@
+#! /bin/bash
+TEST_DIR='../../../code/compliance_tests/rv_tests'
+CODE_DIR='../../../code/'
+DATA_DIR='../../../code/compliance_tests'
+SRC_DIR='../core/simulation'
+
+source $CODE_DIR/rv32i-settings.sh &&
+make clean && make &&
+
+echo "-----RUNNING COMPLIANCE TESTS-----"
+passed=0
+failed=0
+
+for f in "$TEST_DIR"/*.S; do
+    no_path=$(basename "$f")
+    test="${no_path%.S}"
+    
+    cp $DATA_DIR/$test.imem.dat  ../code/ihex/code.hex 
+    cp $DATA_DIR/$test.dmem.dat ../code/ihex/codemem.hex
+    make -C $SRC_DIR > log
+    result=$(cat log | grep -e "PASS" -e "FAIL")
+    if [[ $result == *"PASS"* ]]; then
+        echo -e   $test "\t:" "$(tput setaf 2)${result}$(tput sgr0)"
+        ((passed++))
+    elif [[ $result == *"FAIL"* ]]; then
+        echo -e   $test "\t:" "$(tput setaf 1)${result}$(tput sgr0)"
+        ((failed++))
+    else
+        echo "STATUS line not found or unknown status."
+    fi
+
+    rm ../code/ihex/code.hex
+    rm ../code/ihex/codemem.hex
+done
+
+echo "PASSED :" $passed
+echo "FAILED :" $failed
+echo done!

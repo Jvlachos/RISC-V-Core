@@ -1,7 +1,7 @@
 
 module mem_sync_sp_rvdmem #(
   parameter DEPTH       = 4096,
-  parameter DATA_WIDTH  = 64,
+  parameter DATA_WIDTH  = 32,
   parameter ADDR_WIDTH  = DATA_WIDTH,   // address size equals data size
   parameter DATA_BYTES  = DATA_WIDTH/8,
   parameter INIT_ZERO   = 0,
@@ -31,6 +31,11 @@ input[ADDR_WIDTH-1:0] addr;
       sim_control = 1;
       $display("Simulation finished at time (%t) with write to halt address (0x%h = %d)!",$time,addr, data);
       $display("main() return value = %d", data);
+      if(data == 0)
+        $display("PASS");
+      else
+        $display("FAIL");
+
       $finish;
     end
     else begin
@@ -73,20 +78,22 @@ logic [DATA_WIDTH-1:0] mem [0 : DEPTH-1];
 always @(posedge clk) begin
   // do not perform writes on sim_control addresses
   if ( (i_wen != 0) && !sim_control(i_wdata, i_addr) ) begin
-    $display("ADDRESS : 0x%0h\n",addr);
     for (int i=0 ; i<DATA_BYTES; i++) begin
       if ( i_wen[i] ) begin
         mem[addr][8*i +: 8] = i_wdata[8*i +: 8];
       end
     end
+  $display("WRITE CONFIRM - WRITTING :0x%0h at : 0x%0h ACTUAL : 0x%0h\n",i_wdata,addr,mem[addr]);
   end
 
-  o_rdata = mem[addr];
+    $display("ADDRESS : 0x%0h IADDR : 0x%0h --- DATA: 0x%0h\n",addr,i_addr,mem[addr]);
+  //o_rdata = mem[addr];
   // override with cycle value when reading from the sim cycle address
-  if ( sim_cycle(i_addr, (i_wen==0)) ) begin
-    o_rdata = cycle;
-  end
+  //if ( sim_cycle(i_addr, (i_wen==0)) ) begin
+ //   o_rdata = cycle;
+ // end
 end
+assign o_rdata = mem[addr];
 
 // initialize memory from file
 initial begin

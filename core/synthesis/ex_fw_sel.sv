@@ -5,6 +5,7 @@ module ex_fw_sel
     input core::fw_cntrl_bus_t fw_cntrl_i,
     input core::bypass_bus_t mem_bypass_i,
     input core::bypass_bus_t wb_bypass_i,
+    input core::bypass_bus_t wb_bypass_late_i,
     output logic [31:0] rs1_in_o,
     output logic [31:0] rs2_in_o
 );
@@ -14,6 +15,24 @@ module ex_fw_sel
         rs1_in_o = 32'b0;
         rs2_in_o = 32'b0;
 
+        if(fw_cntrl_i.rs1 == core::MEM_STAGE)
+            rs1_in_o = mem_bypass_i.rd;
+        else if(fw_cntrl_i.rs1 == core::WB_STAGE)
+            rs1_in_o = wb_bypass_i.rd;
+        else if(fw_cntrl_i.rs1 == core::WBLATE_STAGE)
+            rs1_in_o = wb_bypass_late_i.rd;
+        else
+            rs1_in_o = bus_i.rs1_data;
+        
+        if(fw_cntrl_i.rs2 == core::MEM_STAGE)
+            rs2_in_o = mem_bypass_i.rd;
+        else if(fw_cntrl_i.rs2 == core::WB_STAGE)
+            rs2_in_o = wb_bypass_i.rd;
+        else if(fw_cntrl_i.rs2 == core::WBLATE_STAGE)
+            rs2_in_o = wb_bypass_late_i.rd;
+        else    
+            rs2_in_o = bus_i.rs2_data;
+/*
         if(fw_cntrl_i.stage != core::NONE_STAGE)begin
             assert (fw_cntrl_i.regs != core::RS_NONE) 
             else   begin
@@ -76,7 +95,7 @@ module ex_fw_sel
             rs1_in_o = bus_i.rs1_data;
             rs2_in_o = bus_i.rs2_data;  
         end
-
+    */
 
     end
     
