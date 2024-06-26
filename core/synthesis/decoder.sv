@@ -78,6 +78,7 @@ module decoder
             id_bus_o.mem_op = core::MEM_OP_t'({core::STORE_PRFX,instruction.stype.funct3});
          end          
          riscv::L_OP: begin
+            
             format = core::I_FORMAT; 
             rs1_t = riscv::reg_t'(instruction.itype.rs1);
             rd_t  = riscv::reg_t'(instruction.itype.rd);

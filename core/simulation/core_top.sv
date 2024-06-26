@@ -2,6 +2,7 @@
 `define CLK_PERIOD 20
 
 
+
 module core_top;
     import core::*;
     import riscv::*;
@@ -114,39 +115,34 @@ module core_top;
     integer i_index; 
 
     initial begin
-        db_i_mem[0] = riscv::addi(5,1,14);
-        db_i_mem[1] = riscv::load(12,7,6,0,0);
-        db_i_mem[2] = riscv::addi(2,7,5);
-        db_i_mem[3] = riscv::ori(1,2,5);
-        db_i_mem[4] = riscv::xori(1,2,5);
-        i_index = 0;
+      
         @(posedge clk);
 
         rst = 1;
         while(1) begin
             
-           // pc_incr = 1;
-//            instruction = db_i_mem[i_index];
+          
             @(posedge clk);
-//            cycle_no ++;
-            //pc_incr = 0;
-           // #5;
-            //display_side();
-          //  display_bus(id_bus,"ID/EX");
-          //  display_bus(ex_bus,"EX/MEM");
-          //  display_bus(mem_bus,"MEM/WB");
-          //  display_bus(wb_late,"WB/ALL");
-          //  $display("\n ---------------------------------------------------- \n");
-            i_index++;
+            //display_all();
         end
         $finish;
     end
 
     always @(posedge clk) begin
         cycle_no <= cycle_no + 1;
-        if(cycle_no > 100000)
-            $finish;
+        //if(cycle_no > 1000)
+        //    $finish;
     end
+
+
+    task display_all();
+        display_bus(id_bus,"ID/EX");
+        display_bus(ex_bus,"EX/MEM");
+        display_bus(mem_bus,"MEM/WB");
+        display_bus(wb_late,"WB/ALL");
+        $display("\n ---------------------------------------------------- \n");
+
+    endtask
 
     task display_bus(pipeline_bus_t curr_bus,string msg);
         $display("Cycle : %0d Stage : %s\n",cycle_no,msg);

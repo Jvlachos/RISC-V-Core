@@ -1,3 +1,5 @@
+
+`timescale 1ns/1ps
 package core;
     
     typedef enum  logic [1:0] { 

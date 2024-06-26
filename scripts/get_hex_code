@@ -2,7 +2,8 @@
 EX1="example1"
 EX2="fib"
 EX3="coremark"
-
+EX4="overflow"
+EX5="example5"
 src=""
 
 if [ $1 = "example1" ]; then
@@ -11,6 +12,10 @@ elif [ $1 = "example2" ]; then
     src=$EX2
 elif [ $1 = "example3" ]; then
     src=$EX3
+elif [ $1 = "example4" ]; then
+    src=$EX4
+elif [ $1 = "example5" ]; then
+    src=$EX5
 fi
 
 cd  ../../../code/"$1" &&

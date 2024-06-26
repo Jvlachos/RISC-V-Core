@@ -15,7 +15,7 @@ module imm_generator
         //imm_o = 32'b0;
         unique case (format)
             core::I_FORMAT: begin
-                if(instruction.itype.funct3 == riscv::SRLI_SRAI || instruction.itype.funct3 == riscv::SLLI_F3) begin
+                if(instruction.itype.opcode == riscv::I_OP &&  (instruction.itype.funct3 == riscv::SRLI_SRAI || instruction.itype.funct3 == riscv::SLLI_F3)) begin
                     imm_o = {{28{instr_i[24]}},instr_i[23:20]};
                 end
                 else begin

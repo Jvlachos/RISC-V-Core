@@ -74,17 +74,6 @@ module load_cntrl
                         end
                     endcase
                 end
-                //needed for forwarding (stores)
-                /*core::SB:begin
-                    mem2se_o.rd_res[7:0] = rdata_i[7:0];
-                end
-                core::SH:begin
-                    mem2se_o.rd_res[15:0] = rdata_i[15:0];
-                end
-                core::SW:begin
-                    mem2se_o.rd_res = rdata_i;
-                end
-                */
             endcase 
         end
         else begin 

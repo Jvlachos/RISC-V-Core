@@ -17,10 +17,8 @@ module mem_stage
     
     
     core::mem_cntrl_bus_t store_cntrl;
-    core::mem_cntrl_bus_t load_cntrl;
     core::pipeline_bus_t mem2se;
     core::pipeline_bus_t mem2wb;
-    core::pipeline_bus_t mem2ld;
     
     always_ff@(posedge clk,negedge rst) begin
         if(~rst) 
@@ -67,15 +65,6 @@ module mem_stage
             mem_bus_o.instr <= riscv::I_NOP;
             mem_bus_o <= '0;
         end    
-      //  else if(bus_i.pipeline_stall) begin
-        //    mem_bus_o[core::BUS_BITS-1:0] <= '0;
-          //  mem_bus_o.mem_op <= core::MEM_NOP;
-            //mem_bus_o.alu_op <= core::ALU_NOP;
-            //mem_bus_o.format <= core::NOP;
-            //mem_bus_o.instr  <= riscv::I_NOP;
-            //mem_bus_o.pipeline_stall <= 1'b1; 
-        //end
-        
         else begin
             mem_bus_o <= mem2wb;
         end

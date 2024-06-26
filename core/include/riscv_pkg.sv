@@ -122,6 +122,7 @@ package riscv;
     localparam  S_OP     =   7'b0100011;
 
     localparam  I_OP     =   7'b0010011;
+
     typedef enum logic [2:0] {
     ADDI_F3  =   3'b000,
     SLTI_F3  =   3'b010,

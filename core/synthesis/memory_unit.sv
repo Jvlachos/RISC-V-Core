@@ -21,12 +21,13 @@ module memory_unit
         mem_bus.mem_op = core::MEM_NOP;
         mem_bus.mem_rd = '0;
         if(is_mem) begin
-            mem_bus.addr= bus_i.imm + rs1_in_i;
+            mem_bus.addr= rs1_in_i + bus_i.imm;
             mem_bus.mem_op = bus_i.mem_op;
             if(bus_i.mem_op[MEM_OP_BITS-1] == core::STORE_PRFX)
                 mem_bus.w_data = rs2_in_i;
-            else 
+            else begin
                 mem_bus.mem_rd = bus_i.rd;
+            end
         end
         else
             ;
