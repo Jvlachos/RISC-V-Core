@@ -6,6 +6,7 @@ module mem_signext
     output core::bypass_bus_t bp_o
 );
 
+
     always_comb begin 
         bus_o.mem_op = bus_i.mem_op;
         bus_o.alu_op   = bus_i.alu_op;
@@ -23,6 +24,7 @@ module mem_signext
         bus_o.rd_res = 32'b0;
         bp_o.rd = 32'b0;
         bp_o.rd_addr = 32'b0;
+
         if(bus_i.mem_op != core::MEM_NOP && bus_i.mem_op[MEM_OP_BITS-1] == core::LOAD_PRFX) begin
             $display("MEMSE :0x%0h\n",bus_i.rd_res); //if its a load give the result to wb and bypass
             unique case (bus_i.mem_op)

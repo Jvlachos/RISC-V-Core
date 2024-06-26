@@ -87,13 +87,13 @@ always @(posedge clk) begin
   end
 
     $display("ADDRESS : 0x%0h IADDR : 0x%0h --- DATA: 0x%0h\n",addr,i_addr,mem[addr]);
-  //o_rdata = mem[addr];
+  o_rdata = mem[addr];
   // override with cycle value when reading from the sim cycle address
-  //if ( sim_cycle(i_addr, (i_wen==0)) ) begin
- //   o_rdata = cycle;
- // end
+  if ( sim_cycle(i_addr, (i_wen==0)) ) begin
+    o_rdata = cycle;
+  end
 end
-assign o_rdata = mem[addr];
+//assign o_rdata = mem[addr];
 
 // initialize memory from file
 initial begin

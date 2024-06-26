@@ -96,9 +96,11 @@ package core;
 
     typedef struct packed {
         logic [DATA_BYTES-1:0] write_en;
+        MEM_OP_t mem_op;
         logic [31:0] addr;
         logic [31:0] r_data;
         logic [31:0] w_data;
+        logic [4:0]  mem_rd;
     } mem_cntrl_bus_t;
     
     typedef enum logic [1:0] {

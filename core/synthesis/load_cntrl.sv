@@ -39,7 +39,7 @@ module load_cntrl
                             mem2se_o.rd_res[15:0] = rdata_i[23:8];
                         end
                         2'b10: begin
-                            mem2se_o.rd_res[15:0] = rdata_i[31:16];
+                            mem2se_o.rd_res[31:16] = rdata_i[31:16];
                         end
                         default: begin
                             ;

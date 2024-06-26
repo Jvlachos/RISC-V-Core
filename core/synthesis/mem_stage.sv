@@ -7,15 +7,15 @@ module mem_stage
    input core::pipeline_bus_t bus_i,
    input core::mem_cntrl_bus_t mem_cntrl_i,
    output core::pipeline_bus_t mem_bus_o,
-   output core::bypass_bus_t mem_bp_o,
-   input logic[31:0] ld_addr,
-   input core::MEM_OP_t exmemop
+   output core::bypass_bus_t mem_bp_o
+   
 );
 
     logic [31:0] rdata;    
     logic [31:0] addr;
-    assign addr = exmemop[MEM_OP_BITS-1] == core::LOAD_PRFX ? ld_addr : bus_i.mem_addr;
-
+   // assign addr = exmemop[MEM_OP_BITS-1] == core::LOAD_PRFX ? ld_addr : bus_i.mem_addr;
+    
+    
     core::mem_cntrl_bus_t store_cntrl;
     core::mem_cntrl_bus_t load_cntrl;
     core::pipeline_bus_t mem2se;
@@ -27,10 +27,10 @@ module mem_stage
         .bus_i(bus_i),
         .rdata_i(rdata),
         .mem2se_o(mem2se),
-        .addr(bus_i.mem_addr));
+        .addr(mem_cntrl_i.addr));
 
     store_cntrl store_unit(
-        .bus_i(bus_i),
+        .bus_i(mem_cntrl_i),
         .store_cntrl_o(store_cntrl));
 
     mem_signext mem_signext_inst(
@@ -44,7 +44,7 @@ module mem_stage
     .INIT_FILE("/home/dvlachos/project/RISC-V-Core/code/ihex/codemem.hex"))
     memory_instance(
         .clk(clk),
-        .i_addr(bus_i.mem_addr),
+        .i_addr(mem_cntrl_i.addr),
         .i_wdata(store_cntrl.w_data),
         .i_wen(store_cntrl.write_en),
         .o_rdata(rdata)

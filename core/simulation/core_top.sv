@@ -99,10 +99,8 @@ module core_top;
         .bus_i(ex_bus),
         .mem_cntrl_i(mem_cntrl),
         .mem_bus_o(mem_bus),
-        .mem_bp_o(mem_bypass),
-        .ld_addr(ld_addr),
-        .exmemop(exmemop));
-
+        .mem_bp_o(mem_bypass));
+        
     wb_stage wb_s(
         .clk(clk),
         .rst(rst),
