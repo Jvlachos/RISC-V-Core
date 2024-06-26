@@ -83,10 +83,10 @@ always @(posedge clk) begin
         mem[addr][8*i +: 8] = i_wdata[8*i +: 8];
       end
     end
-  $display("WRITE CONFIRM - WRITTING :0x%0h at : 0x%0h ACTUAL : 0x%0h\n",i_wdata,addr,mem[addr]);
+ // $display("WRITE CONFIRM - WRITTING :0x%0h at : 0x%0h ACTUAL : 0x%0h\n",i_wdata,addr,mem[addr]);
   end
 
-    $display("ADDRESS : 0x%0h IADDR : 0x%0h --- DATA: 0x%0h\n",addr,i_addr,mem[addr]);
+ //  $display("READING ADDRESS : 0x%0h IADDR : 0x%0h --- DATA: 0x%0h\n",addr,i_addr,mem[addr]);
   o_rdata = mem[addr];
   // override with cycle value when reading from the sim cycle address
   if ( sim_cycle(i_addr, (i_wen==0)) ) begin

@@ -14,12 +14,13 @@ module wb_stage
 
     logic [31:0] rd;
     
-    always_comb begin 
-        rd = '0;
-        if(bus_i.alu_op != core::ALU_NOP || bus_i.mem_op!= core::MEM_NOP)
-            rd = bus_i.rd_res;
-    end
-    assign wb_bp_o.rd = rd;
+    //always_comb begin 
+      //  if(bus_i.alu_op != core::ALU_NOP || bus_i.mem_op!= core::MEM_NOP)
+        //    rd = bus_i.rd_res;
+       // else
+         //   rd = '0;
+    //end
+    assign wb_bp_o.rd = bus_i.rd_res;
     assign wb_bp_o.rd_addr = bus_i.rd;
     assign wb_bus_o = bus_i;
 

@@ -20,14 +20,21 @@ module mem_stage
     core::mem_cntrl_bus_t load_cntrl;
     core::pipeline_bus_t mem2se;
     core::pipeline_bus_t mem2wb;
-
+    core::pipeline_bus_t mem2ld;
+    
+    always_ff@(posedge clk,negedge rst) begin
+        if(~rst) 
+            addr <= '0;
+        else
+            addr <= mem_cntrl_i.addr;
+    end
     
 
     load_cntrl load_unit(
         .bus_i(bus_i),
         .rdata_i(rdata),
         .mem2se_o(mem2se),
-        .addr(mem_cntrl_i.addr));
+        .addr(addr));
 
     store_cntrl store_unit(
         .bus_i(mem_cntrl_i),
@@ -36,7 +43,8 @@ module mem_stage
     mem_signext mem_signext_inst(
         .bus_i(mem2se),
         .bus_o(mem2wb),
-        .bp_o(mem_bp_o));
+        .bp_o(mem_bp_o),
+        .addr_offset_i(addr[1:0]));
 
 
     mem_sync_sp_rvdmem #

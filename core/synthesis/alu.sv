@@ -151,9 +151,10 @@ module alu
                     alu_bus_o.rd_res = $signed(alu_bus_i.imm) + alu_bus_i.pc;                   
                 end
                 core::ALU_NOP: begin
-                    $display("ALU_NOP\n");
+                   ;
+                    //$display("ALU_NOP\n");
                 end
-                default: $display("Illegal insts?");
+                default: ;
             endcase
             //alu_bus_o.rd_res = 32'(signed'(alu_bus_o.rd_res));
         end

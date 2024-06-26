@@ -3,10 +3,11 @@ module mem_signext
 (
     input core::pipeline_bus_t bus_i,
     output core::pipeline_bus_t bus_o,
-    output core::bypass_bus_t bp_o
-);
+    output core::bypass_bus_t bp_o,
+    input logic[1:0] addr_offset_i
+); 
 
-
+   
     always_comb begin 
         bus_o.mem_op = bus_i.mem_op;
         bus_o.alu_op   = bus_i.alu_op;
@@ -26,15 +27,15 @@ module mem_signext
         bp_o.rd_addr = 32'b0;
 
         if(bus_i.mem_op != core::MEM_NOP && bus_i.mem_op[MEM_OP_BITS-1] == core::LOAD_PRFX) begin
-            $display("MEMSE :0x%0h\n",bus_i.rd_res); //if its a load give the result to wb and bypass
+         
+            //$display("MEMSE :0x%0h\n",bus_i.rd_res); //if its a load give the result to wb and bypass
             unique case (bus_i.mem_op)
                 core::LB:begin
-                    bus_o.rd_res = {{24{bus_i.rd_res[7]}},bus_i.rd_res[7:0]};
-                    $display("MEMSE bus_o RD:0x%0h\n",bus_o.rd_res); 
+                   bus_o.rd_res = {{24{bus_i.rd_res[7]}},bus_i.rd_res[7:0]};
                 end
                 core::LH:begin
-                    $display("MEMSE bus_o RD:0x%0h\n",bus_o.rd_res); 
                     bus_o.rd_res = {{16{bus_i.rd_res[15]}},bus_i.rd_res[15:0]};
+                    //$display("MEMSE bus_o RD:0x%0h\n",bus_o.rd_res); 
                 end
                 core::LW:begin
                     bus_o.rd_res = bus_i.rd_res;
@@ -56,8 +57,8 @@ module mem_signext
         end
         else begin //if neither pass regular values to bp and wb
             bus_o.rd_res = bus_i.rd_res;
-            bp_o.rd = bus_o.rd_res;
-            bp_o.rd_addr = bus_o.rd;
+            bp_o.rd = bus_i.rd_res;
+            bp_o.rd_addr = bus_i.rd;
             bus_o.rf_wr_en = bus_i.rf_wr_en;
         end
 

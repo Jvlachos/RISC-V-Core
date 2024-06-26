@@ -35,7 +35,7 @@ module id_stage
             id_bus_o.instr  <= riscv::I_NOP;
         end
         else if(flush_i ) begin
-            $display("Flushing..\n");
+           // $display("Flushing..\n");
             id_bus_o[core::BUS_BITS-1:0] <= '0;
             id_bus_o.mem_op <= core::MEM_NOP;
             id_bus_o.alu_op <= core::ALU_NOP;
@@ -43,7 +43,7 @@ module id_stage
             id_bus_o.instr  <= riscv::I_NOP; 
         end
         else if(stall_i) begin
-            $display("Stalling..\n");
+            //$display("Stalling..\n");
             id_bus_o[core::BUS_BITS-1:0] <= '0;
             id_bus_o.mem_op <= core::MEM_NOP;
             id_bus_o.alu_op <= core::ALU_NOP;

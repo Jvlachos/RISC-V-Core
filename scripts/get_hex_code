@@ -5,7 +5,7 @@ EX3="coremark"
 
 src=""
 
-if [ $1 = "example1"]; then
+if [ $1 = "example1" ]; then
     src=$EX1
 elif [ $1 = "example2" ]; then
     src=$EX2

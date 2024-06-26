@@ -76,18 +76,18 @@ module ex_stage
          //   ex_bus_o.pipeline_stall <= 1'b1; 
        // end
         else
-            $display("BYP RS1 %0d : %s RS2 %0d : %s\n",fw_cntrl_i.rs1_addr,fw_cntrl_i.rs1.name(),fw_cntrl_i.rs2_addr,fw_cntrl_i.rs2.name());
+           // $display("BYP RS1 %0d : %s RS2 %0d : %s\n",fw_cntrl_i.rs1_addr,fw_cntrl_i.rs1.name(),fw_cntrl_i.rs2_addr,fw_cntrl_i.rs2.name());
             ex_bus_o <= ex_bus;
             ex_bus_o.rd_res <= bus_i.is_branch ? rd_branch : ex_bus.rd_res;
            
     end
     
-    always_comb begin
-        if(bus_i.mem_op == core::MEM_NOP)begin
-            ex2mem_o = '0;
-        end
-        else
-            ex2mem_o = ex2mem;
+    //always_comb begin
+    //    if(bus_i.mem_op == core::MEM_NOP)begin
+     //       ex2mem_o = '0;
+     //   end
+      //  else
+     assign ex2mem_o = ex2mem;
 
-    end
+   // end
 endmodule

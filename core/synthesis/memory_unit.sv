@@ -23,7 +23,6 @@ module memory_unit
         if(is_mem) begin
             mem_bus.addr= bus_i.imm + rs1_in_i;
             mem_bus.mem_op = bus_i.mem_op;
-            $display("R1 : %0d + IMM : %0d = %0d\n",rs1_in_i,bus_i.imm,mem_bus.addr);
             if(bus_i.mem_op[MEM_OP_BITS-1] == core::STORE_PRFX)
                 mem_bus.w_data = rs2_in_i;
             else 

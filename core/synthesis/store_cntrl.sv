@@ -16,7 +16,7 @@ module store_cntrl
             unique case(bus_i.mem_op)
                 core::SB:begin
                     store_cntrl_o.write_en[bus_i.addr[1:0]+:1] = 1'b1;
-                    $display("BYTE EN : %b\n",store_cntrl_o.write_en);
+                    //$display("BYTE EN : %b\n",store_cntrl_o.write_en);
                     store_cntrl_o.w_data[bus_i.addr[1:0]*8 +: 8] = bus_i.w_data[7:0];
                 end
                 core::SH:begin
@@ -25,15 +25,16 @@ module store_cntrl
 
                     case(bus_i.addr[1:0])
                         2'b00: begin
-                            store_cntrl_o.write_en[1:0] = 2'b11;
+                            store_cntrl_o.write_en = 4'b0011;
                             store_cntrl_o.w_data[15:0] = bus_i.w_data[15:0];
                         end
                         2'b01:begin
                             store_cntrl_o.write_en[2:1] = 2'b11;
                             store_cntrl_o.w_data[23:8] = bus_i.w_data[15:0];
+                            $display("MISSALIGNED STORE? \n");
                         end
                         2'b10:begin
-                            store_cntrl_o.write_en[3:2] = 2'b11;
+                            store_cntrl_o.write_en = 4'b1100;
                             store_cntrl_o.w_data[31:16] = bus_i.w_data[15:0];
                         end
                         default: ;
@@ -41,7 +42,7 @@ module store_cntrl
                     endcase
                 end
                 core::SW:begin
-                    $display("STORE ADDR: 0x%0h\n",bus_i.addr);
+                   // $display("STORE ADDR: 0x%0h\n",bus_i.addr);
                     store_cntrl_o.write_en = 4'b1111;
                     store_cntrl_o.w_data[31:0] = bus_i.w_data[31:0];
                 end

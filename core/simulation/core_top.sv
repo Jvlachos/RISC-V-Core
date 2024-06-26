@@ -132,11 +132,11 @@ module core_top;
             //pc_incr = 0;
            // #5;
             //display_side();
-            display_bus(id_bus,"ID/EX");
-            display_bus(ex_bus,"EX/MEM");
-            display_bus(mem_bus,"MEM/WB");
-            display_bus(wb_late,"WB/ALL");
-            $display("\n ---------------------------------------------------- \n");
+          //  display_bus(id_bus,"ID/EX");
+          //  display_bus(ex_bus,"EX/MEM");
+          //  display_bus(mem_bus,"MEM/WB");
+          //  display_bus(wb_late,"WB/ALL");
+          //  $display("\n ---------------------------------------------------- \n");
             i_index++;
         end
         $finish;
@@ -144,8 +144,8 @@ module core_top;
 
     always @(posedge clk) begin
         cycle_no <= cycle_no + 1;
-        //if(cycle_no > 1000)
-          //  $finish;
+        if(cycle_no > 100000)
+            $finish;
     end
 
     task display_bus(pipeline_bus_t curr_bus,string msg);

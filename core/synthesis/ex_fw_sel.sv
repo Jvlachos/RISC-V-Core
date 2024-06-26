@@ -14,7 +14,7 @@ module ex_fw_sel
     always_comb begin : blockName
         rs1_in_o = 32'b0;
         rs2_in_o = 32'b0;
-
+       // $display("FW FROM : %s - %s\n ",fw_cntrl_i.rs1.name,fw_cntrl_i.rs2.name);
         if(fw_cntrl_i.rs1 == core::MEM_STAGE)
             rs1_in_o = mem_bypass_i.rd;
         else if(fw_cntrl_i.rs1 == core::WB_STAGE)

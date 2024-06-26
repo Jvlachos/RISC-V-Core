@@ -14,16 +14,19 @@ module fw_controller
 
     core::fw_cntrl_bus_t fw_cntrl;
     logic [4:0] rs1_id,rs2_id;
-    logic [4:0] rd_ex,rd_mem,rd_wb;
+    logic [4:0] rd_ex,rd_mem,rd_wb,rd_wb_late;
     bit fw_from_mem;
     bit fw_from_wb;
     //if mem stage has a load
     always_comb begin : fw
-        rs1_id = id_bus_i.rs1;
-        rs2_id = id_bus_i.rs2;
+        //rs1_id = id_bus_i.rs1;
+        ///rs2_id = id_bus_i.rs2;
+        rs1_id = ex_bus_i.rs1;
+        rs2_id = ex_bus_i.rs2;
         rd_ex  = ex_bus_i.rd;
         rd_mem = mem_bus_i.rd;
         rd_wb  = wb_bus_i.rd;
+        rd_wb_late = wb_late_bus_i.rd;
         fw_cntrl.stage = core::NONE_STAGE;
         fw_cntrl.regs  = core::RS_NONE;
         fw_cntrl.rs1 = core::NONE_STAGE;
@@ -32,47 +35,47 @@ module fw_controller
         //fw_from_mem = (rd_ex != '0) && ((rs1_id == rd_ex) || (rs2_id == rd_ex)) 
 //        && ex_bus_i.rf_wr_en &&  ex_bus_i.mem_op[MEM_OP_BITS-1] != core::LOAD_PRFX; 
 
-        if(ex_bus_i.mem_op[MEM_OP_BITS-1] != core::LOAD_PRFX) begin
-            if((rs1_id == rd_ex && rd_ex!='0) && ex_bus_i.rf_wr_en == 1 ) begin
+        //if(ex_bus_i.mem_op[MEM_OP_BITS-1] != core::LOAD_PRFX) begin
+            if((rs1_id == rd_mem && rd_mem!='0) && mem_bus_i.rf_wr_en == 1 ) begin
                 fw_cntrl.rs1 = core::MEM_STAGE;
-                fw_cntrl.rs1_addr = rd_ex;
-            end
-            else if((rs1_id == rd_mem && rd_mem !='0) && mem_bus_i.rf_wr_en == 1) begin
-                fw_cntrl.rs1 = core::WB_STAGE;
                 fw_cntrl.rs1_addr = rd_mem;
             end
-            else if((rs1_id == rd_wb && rd_wb!='0) && wb_bus_i.rf_wr_en == 1) begin
-                fw_cntrl.rs1 = core::WBLATE_STAGE;
+            else if((rs1_id == rd_wb && rd_wb !='0) && wb_bus_i.rf_wr_en == 1) begin
+                fw_cntrl.rs1 = core::WB_STAGE;
                 fw_cntrl.rs1_addr = rd_wb;
+            end
+            else if((rs1_id == rd_wb_late && rd_wb_late!='0) && wb_late_bus_i.rf_wr_en == 1) begin
+                fw_cntrl.rs1 = core::WBLATE_STAGE;
+                fw_cntrl.rs1_addr = rd_wb_late;
             end
             else begin
                 fw_cntrl.rs1 = core::NONE_STAGE;
                 fw_cntrl.rs1_addr = '0;
             end
 
-            if((rs2_id == rd_ex && rd_ex!='0) && ex_bus_i.rf_wr_en == 1) begin
+            if((rs2_id == rd_mem && rd_mem!='0) && mem_bus_i.rf_wr_en == 1) begin
                 fw_cntrl.rs2 = core::MEM_STAGE;
-                fw_cntrl.rs2_addr = rd_ex;
-            end
-            else if((rs2_id == rd_mem && rd_mem!='0) && mem_bus_i.rf_wr_en == 1) begin
-                fw_cntrl.rs2 = core::WB_STAGE;
                 fw_cntrl.rs2_addr = rd_mem;
             end
             else if((rs2_id == rd_wb && rd_wb!='0) && wb_bus_i.rf_wr_en == 1) begin
-                fw_cntrl.rs2 = core::WBLATE_STAGE;
+                fw_cntrl.rs2 = core::WB_STAGE;
                 fw_cntrl.rs2_addr = rd_wb;
+            end
+            else if((rs2_id == rd_wb_late && rd_wb_late!='0) && wb_late_bus_i.rf_wr_en == 1) begin
+                fw_cntrl.rs2 = core::WBLATE_STAGE;
+                fw_cntrl.rs2_addr = rd_wb_late;
             end
             else begin
                 fw_cntrl.rs2 = core::NONE_STAGE;
                 fw_cntrl.rs2_addr = '0;
             end
-        end
-        else begin
-            fw_cntrl.rs1_addr = '0;
-            fw_cntrl.rs2_addr = '0;
-            fw_cntrl.rs1 = core::NONE_STAGE;
-            fw_cntrl.rs2 = core::NONE_STAGE;
-        end
+      //  end
+       // else begin
+        ///    fw_cntrl.rs1_addr = '0;
+        //    fw_cntrl.rs2_addr = '0;
+        //    fw_cntrl.rs1 = core::NONE_STAGE;
+        //    fw_cntrl.rs2 = core::NONE_STAGE;
+       // end
 
 
 
@@ -151,14 +154,14 @@ module fw_controller
     end
 
 
-    always_ff @(posedge clk,negedge rst ) begin : blockName
-        if(~rst)
-            fw_cntrl_o <= '0;
-        else begin
-            fw_cntrl_o <= fw_cntrl;
-        end
-    end
-
+//    always_ff @(posedge clk,negedge rst ) begin : blockName
+  //      if(~rst)
+    //        fw_cntrl_o <= '0;
+      //  else begin
+        //    fw_cntrl_o <= fw_cntrl;
+        //end
+    //end
+    assign fw_cntrl_o = fw_cntrl;
 
 
     
