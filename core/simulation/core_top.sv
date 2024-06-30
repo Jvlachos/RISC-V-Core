@@ -35,7 +35,17 @@ module core_top;
     core::pipeline_bus_t wb_late;    
     logic [31:0] ld_addr;
     core::MEM_OP_t exmemop;
+    core::btb_entry_t btb_entry;
     assign exmemop = id_bus.mem_op;
+
+    btb_cntrl btb_control(
+        .clk(clk),
+        .read_addr_i(pc[core::ADDR_WIDTH+1:2]),
+        .br_cntrl_i(br_bus),
+        .entry_o(btb_entry),
+        .is_branch_i(id_bus.is_branch)
+    );
+
 
     fw_controller fw_control(
         .clk(clk),

@@ -93,7 +93,7 @@ package core;
     typedef struct packed {
         bit is_taken;
         logic [31:0] branch_target;
-        
+        logic [ADDR_WIDTH-1:0] i_addr;
     } br_cntrl_bus_t;
 
     typedef struct packed {
@@ -132,5 +132,34 @@ package core;
         logic [4:0]  rd_addr;
         logic [31:0] rd;
     } bypass_bus_t;
+ 
+    typedef struct packed {
+        logic [ADDR_WIDTH-1:0] i_addr;
+        logic [31:0] target_addr;
+    } btb_entry_t;
 
-endpackage
+    localparam BTB_ENTRY_SIZE = $bits(btb_entry_t);
+
+    localparam GHR_SIZE         = 8;
+    localparam COUNTER_TABLE_SZ = 1024;
+    localparam COUNTER_BITS     = 2;
+    
+    typedef enum logic[COUNTER_BITS-1:0] {
+        STRONGLY_NOT_TAKEN = 2'b00,
+        WEAKLY_NOT_TAKEN   = 2'b01,
+        WEAKLY_TAKEN       = 2'b10,
+        STRONGLY_TAKEN     = 2'b11
+    } cntr_pattern_t;
+
+
+    typedef struct packed {
+        cntr_pattern_t counter;
+    } cntr_table_entry_t;
+
+    typedef struct packed {
+        logic [GHR_SIZE-1:0] GHR;
+    } GHR_t;
+
+    localparam COUNTER_TABLE_BITS = $clog2(COUNTER_TABLE_SZ);
+
+  endpackage

@@ -19,3 +19,4 @@
 ../synthesis/stall_controller.sv
 ../synthesis/fw_controller.sv
 ../synthesis/ex_fw_sel.sv
+../synthesis/btb.sv
