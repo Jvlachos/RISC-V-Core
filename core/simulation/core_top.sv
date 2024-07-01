@@ -37,6 +37,7 @@ module core_top;
     core::MEM_OP_t exmemop;
     core::btb_entry_t btb_entry;
     assign exmemop = id_bus.mem_op;
+    bit prediction;
 
     btb_cntrl btb_control(
         .clk(clk),
@@ -46,6 +47,13 @@ module core_top;
         .is_branch_i(id_bus.is_branch)
     );
 
+    predictor_cntrl predictor_cntrl(
+        .clk(clk),
+        .rst(rst),
+        .br_cntrl_i(br_bus),
+        .is_branch_i(id_bus.is_branch),
+        .read_addr_i(pc),
+        .prediction_o(prediction));
 
     fw_controller fw_control(
         .clk(clk),
@@ -76,7 +84,8 @@ module core_top;
     .pc_incr_en_i(~stall),
     .instr_o(instruction),
     .pc_o(pc),
-    .br_bus_i(br_bus));
+    .br_bus_i(br_bus),
+    .btb_entry_i(btb_entry));
     //decoder_tb dec_s(.clk(clk),.rst(rst),.instruction_i(instruction));
     id_stage id_s(
         .clk(clk),
@@ -140,8 +149,8 @@ module core_top;
 
     always @(posedge clk) begin
         cycle_no <= cycle_no + 1;
-        //if(cycle_no > 1000)
-        //    $finish;
+        if(cycle_no > 1000)
+            $finish;
     end
 
 

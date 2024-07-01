@@ -66,9 +66,10 @@ module ex_stage
             ex_bus_o.instr <= riscv::I_NOP;
        end
 
-        else
+        else begin
             ex_bus_o <= ex_bus;
             ex_bus_o.rd_res <= bus_i.is_branch ? rd_branch : ex_bus.rd_res;
+        end
     end
     
    

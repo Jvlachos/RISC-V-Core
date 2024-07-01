@@ -20,3 +20,4 @@
 ../synthesis/fw_controller.sv
 ../synthesis/ex_fw_sel.sv
 ../synthesis/btb.sv
+../synthesis/predictor_cntrl.sv

@@ -23,7 +23,7 @@ module branch_unit
         if (bus_i.is_branch) begin 
             if(bus_i.alu_op[4:3] == core::BRANCH_PRFX) begin
                 br_bus_o.branch_target = bus_i.pc + bus_i.imm;
-                br_bus_o.i_addr = bus_i.pc[core::ADDR_WIDTH+1:2];
+                br_bus_o.i_addr = bus_i.pc;
                 unique case (bus_i.alu_op)
                     core::ALU_BEQ:begin
                         br_bus_o.is_taken = rs1_in_i == rs2_in_i;

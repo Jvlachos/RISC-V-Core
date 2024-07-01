@@ -93,7 +93,7 @@ package core;
     typedef struct packed {
         bit is_taken;
         logic [31:0] branch_target;
-        logic [ADDR_WIDTH-1:0] i_addr;
+        logic [31:0] i_addr;
     } br_cntrl_bus_t;
 
     typedef struct packed {
@@ -134,12 +134,12 @@ package core;
     } bypass_bus_t;
  
     typedef struct packed {
-        logic [ADDR_WIDTH-1:0] i_addr;
+        logic [31:0] i_addr;
         logic [31:0] target_addr;
     } btb_entry_t;
 
     localparam BTB_ENTRY_SIZE = $bits(btb_entry_t);
-
+    localparam BTB_SIZE       = 4096;
     localparam GHR_SIZE         = 8;
     localparam COUNTER_TABLE_SZ = 1024;
     localparam COUNTER_BITS     = 2;

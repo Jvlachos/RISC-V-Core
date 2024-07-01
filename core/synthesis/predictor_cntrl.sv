@@ -5,38 +5,41 @@ module predictor_cntrl
     input logic rst,
     input core::br_cntrl_bus_t br_cntrl_i,
     input  bit is_branch_i,
-    input  logic [core::ADDR_WIDTH-1:0] read_addr_i,
-    output bit prediction_o,
+    input  logic [31:0] read_addr_i,
+    output bit prediction_o
 );
 
     localparam DH = 1;
 
-    logic [core::COUNTER_TABLE_BITS-1:0] addr;
-    core::GHR_t GHR_ff;
+    logic [core::COUNTER_TABLE_BITS-1:0] r_addr;
+    logic [core::COUNTER_TABLE_BITS-1:0] w_addr;
+    logic [core::GHR_SIZE-1:0] GHR_ff;
     logic [core::GHR_SIZE-1:0] ghr;
     core::cntr_table_entry_t cntr_table [0:core::COUNTER_TABLE_SZ-1];
     core::cntr_pattern_t curr_state;
     core::cntr_pattern_t next_state;
-    bit taken = br_cntrl_i.is_taken;
-    assign addr = {GHR.GHR,read_addr_i[1:0]};
-    assign #DH prediction_o = cntr_table[addr].counter[1];
-    bit update;
+    bit taken;
+    assign taken = br_cntrl_i.is_taken;
+    
+    assign r_addr = {GHR_ff[2:0],read_addr_i[6:0]};
+    assign w_addr = {GHR_ff[2:0],br_cntrl_i.i_addr[6:0]};
+
+
+    assign #DH prediction_o = cntr_table[r_addr].counter[1];
     always @(posedge clk,negedge rst) begin
- //     for(int i = 0; i <32; i++) begin
-   //     $display("REG %0d\n DATA %0d\n",i,rf[i]);
-     // end
         if(~rst)
-            GHR_ff <= '0
-        else if(is_branch_i & update) begin
-            cntr_table[addr].counter <= next_state;
+            GHR_ff <= '0;
+        else if(is_branch_i) begin
+            cntr_table[w_addr].counter <= next_state;
             GHR_ff <= ghr;
+            $display("COUNTER %b GHR %b ADDR %0d PC : %x Taken : %0b\n ",next_state,ghr,w_addr,br_cntrl_i.i_addr,taken);
         end
     end
 
 
     always_comb begin
-        curr_state = cntr_table[addr].counter;
-        next_state = core::STRONGLY_NOT_TAKEN;
+        curr_state = cntr_table[w_addr].counter;
+        //next_state = core::STRONGLY_NOT_TAKEN;
         ghr = '0;
         if(is_branch_i) begin
             ghr = GHR_ff << 1;
@@ -59,4 +62,10 @@ module predictor_cntrl
         end
     end    
     
+
+    initial begin
+        for(int i = 0; i < core::COUNTER_TABLE_SZ; i++) begin
+            cntr_table[i] = '0;
+        end
+    end
 endmodule

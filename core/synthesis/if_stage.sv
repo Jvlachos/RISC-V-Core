@@ -8,7 +8,8 @@ module if_stage
     input  logic pc_incr_en_i,
     output logic [31:0] instr_o,
     output logic [31:0] pc_o,
-    input core::br_cntrl_bus_t br_bus_i
+    input core::br_cntrl_bus_t br_bus_i,
+    input core::btb_entry_t btb_entry_i
 );
 
     logic [31:0] pc;
@@ -28,7 +29,6 @@ module if_stage
 
     always_comb begin  
         pc = 'h100;
-
         if(br_bus_i.is_taken) begin
             pc = br_bus_i.branch_target;
         end
@@ -46,6 +46,7 @@ module if_stage
         end
         else begin
             pc_o <= pc;
+            $display("ENTRY at %x with ENTRY PC : %x\n",pc,btb_entry_i.i_addr);
         end
 
     end
