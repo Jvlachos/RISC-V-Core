@@ -21,7 +21,7 @@ fi
 cd  ../../../code/"$1" &&
 source ../rv32i-settings.sh &&
 make clean && make &&
-cp "$src".imem.dat  ../../project/RISC-V-Core/code/ihex/code.hex 
-cp "$src".dmem.dat ../../project/RISC-V-Core/code/ihex/codemem.hex 
+cp "$src".imem.dat  ../../probranch/RISC-V-Core/code/ihex/code.hex 
+cp "$src".dmem.dat ../../probranch/RISC-V-Core/code/ihex/codemem.hex 
 
 echo done!

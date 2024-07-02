@@ -9,12 +9,24 @@ module if_stage
     output logic [31:0] instr_o,
     output logic [31:0] pc_o,
     input core::br_cntrl_bus_t br_bus_i,
-    input core::btb_entry_t btb_entry_i
+    input core::btb_entry_t btb_entry_i,
+    input bit prediction_i
 );
 
     logic [31:0] pc;
+    
+    bit entry_found;
+    bit branch_instr;
+    bit target_jump_en;
+    logic [6:0] op;
+    assign entry_found = btb_entry_i.i_addr != '0;
+    assign op = instr_o[6:0];
+    assign branch_instr = op == riscv::B_OP ||  op == riscv::JAL_OP || op == riscv::JALR_OP; 
+    assign target_jump_en = entry_found & prediction_i & ~br_bus_i.mispredict & branch_instr & pc_incr_en_i;
+    logic [31:0] instr;
+
     mem_sync_sp 
-    #(.INIT_FILE("/home/dvlachos/project/RISC-V-Core/code/ihex/code.hex"),
+    #(.INIT_FILE("/home/dvlachos/probranch/RISC-V-Core/code/ihex/code.hex"),
       .ADDR_WIDTH(core::ADDR_WIDTH),
       .DEPTH(core::DEPTH),
       .DATA_WIDTH(core::DATA_WIDTH),
@@ -26,8 +38,29 @@ module if_stage
     .i_wen(wen_i),
     .o_rdata(instr_o));
 
-
-    always_comb begin  
+    //assign instr_o = br_bus_i.mispredict ? riscv::I_NOP : instr;
+     always_comb begin  
+        pc = 'h100;
+       // $display("ENTRY TARGET : %0x\n",btb_entry_i.target_addr);
+        if(~pc_incr_en_i )
+            pc = pc_o;
+        else if(br_bus_i.mispredict) begin
+            pc = br_bus_i.mispredict_target;
+           // $display("PC MIS : %0x\n",pc);
+        end
+        else if(target_jump_en) begin
+            pc = btb_entry_i.target_addr;
+        end
+    
+        else if(pc_incr_en_i) begin
+                pc = pc_o +4 ; 
+        end
+        else
+            ;
+        
+        
+    end
+  /*  always_comb begin  
         pc = 'h100;
         if(br_bus_i.is_taken) begin
             pc = br_bus_i.branch_target;
@@ -38,17 +71,23 @@ module if_stage
         else begin
             pc = pc_o;
         end
-    end
-
+    end */
+    
     always_ff @(posedge clk,negedge rst ) begin  
         if(~rst) begin
             pc_o <= 'h100;
         end
+ 
+        //else if(target_jump_en) begin
+         //   pc_o <= btb_entry_i.target_addr;
+            
+            //$display("J to target:%x PC: %x PRED: %0b\n",btb_entry_i.target_addr,btb_entry_i.i_addr,prediction_i);
+      //  end
         else begin
             pc_o <= pc;
-            $display("ENTRY at %x with ENTRY PC : %x\n",pc,btb_entry_i.i_addr);
+            //$display(" pc :%x\n",pc);
+            //$display("ENTRY at %x with ENTRY PC : %x\n",pc,btb_entry_i.i_addr);
         end
-
     end
     
 endmodule

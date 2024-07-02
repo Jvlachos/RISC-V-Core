@@ -25,12 +25,14 @@ input[ADDR_WIDTH-1:0] addr;
   begin
     if ( addr == 'h40 ) begin
       $write("%c",data[7:0]);
+      //$display("cycle : %0d\n",cycle);
       sim_control = 1;
     end
     else if ( addr == 'h50 ) begin
       sim_control = 1;
       $display("Simulation finished at time (%t) with write to halt address (0x%h = %d)!",$time,addr, data);
       $display("main() return value = %d", data);
+      $display("CYCLES : %d\n",cycle);
       if(data == 0)
         $display("PASS");
       else

@@ -8,7 +8,9 @@ module decoder
    input  logic [31:0] pc_i,
    input core::pipeline_bus_t wb_bus_i,
    output core::pipeline_bus_t id_bus_o,
-   output logic [2:0] format
+   output logic [2:0] format,
+   input bit pred_i,
+   input btb_entry_t btb_entry_i
 );
    imm_generator im_gen(
         .instr_i(instruction_i),
@@ -47,6 +49,8 @@ module decoder
       id_bus_o.pc          =  pc_i;
       id_bus_o.rf_wr_en    = 1'b0;
       id_bus_o.pipeline_stall =1'b0;
+      id_bus_o.prediction = 0;
+      id_bus_o.btb_entry= '0;
 
        case (instruction.instruction[6:0])
          riscv::I_OP: begin
@@ -113,16 +117,22 @@ module decoder
             format = core::J_FORMAT;
             rd_t   = riscv::reg_t'(instruction.utype.rd);
             id_bus_o.is_branch = 1'b1;
+            id_bus_o.btb_entry = btb_entry_i;
             id_bus_o.rd = instruction.utype.rd;
             id_bus_o.rs1 = '0;
             id_bus_o.rs2 = '0;
             id_bus_o.format = core::J_FORMAT;
             id_bus_o.alu_op = core::ALU_JAL;
             id_bus_o.rf_wr_en = rd_t != riscv::zero;
+
+            id_bus_o.prediction = pred_i && btb_entry_i.i_addr != '0;
+
          end
          riscv::JALR_OP: begin;
             format = core::J_FORMAT;
             id_bus_o.is_branch = 1'b1;
+            id_bus_o.btb_entry = btb_entry_i;
+
             rd_t = riscv::reg_t'(instruction.itype.rd);
             rs1_t = riscv::reg_t'(instruction.itype.rs1);
             id_bus_o.rd = instruction.itype.rd;
@@ -131,9 +141,13 @@ module decoder
             id_bus_o.format = core::J_FORMAT;
             id_bus_o.alu_op = core::ALU_JALR;
             id_bus_o.rf_wr_en = rd_t != riscv::zero;
+           
+            id_bus_o.prediction = pred_i && btb_entry_i.i_addr != '0;
+
          end
          riscv::B_OP: begin;
             format = core::B_FORMAT;
+            id_bus_o.btb_entry = btb_entry_i;
             rs1_t = riscv::reg_t'(instruction.btype.rs1);
             rs2_t = riscv::reg_t'(instruction.btype.rs2);
             id_bus_o.is_branch = 1'b1;
@@ -142,6 +156,7 @@ module decoder
             id_bus_o.rd = '0;
             id_bus_o.format = core::B_FORMAT;
             id_bus_o.alu_op = core::ALU_OP_t'({core::BRANCH_PRFX,instruction.btype.funct3});
+            id_bus_o.prediction = pred_i && btb_entry_i.i_addr != '0;
          end
          riscv::RR_OP: begin;
             format = core::R_FORMAT;

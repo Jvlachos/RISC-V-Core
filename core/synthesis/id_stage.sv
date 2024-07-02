@@ -11,7 +11,9 @@ module id_stage
     input logic flush_i,
     input bit stall_i,
     output logic[2:0] format_o,
-    output core::pipeline_bus_t id2fw_cntrl_o);
+    output core::pipeline_bus_t id2fw_cntrl_o,
+    input bit prediction_i,
+    input core::btb_entry_t btb_entry_i);
 
     core::pipeline_bus_t id_bus;
     assign id2fw_cntrl_o = id_bus;
@@ -22,7 +24,9 @@ module id_stage
     .pc_i(pc_i),
     .wb_bus_i(wb_bus_i),
     .id_bus_o(id_bus),
-    .format(format_o));
+    .format(format_o),
+    .pred_i(prediction_i),
+    .btb_entry_i(btb_entry_i));
 
 
  

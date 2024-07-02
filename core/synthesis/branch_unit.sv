@@ -11,8 +11,15 @@ module branch_unit
     output logic [31:0] rd_o
 );
 
+    bit mispredict;
+    bit force_mis;
     
-    assign flush_o = br_bus_o.is_taken & bus_i.is_branch; 
+    bit btb_entry_exists;
+    bit btb_entry_diff;
+    assign btb_entry_exists = bus_i.btb_entry.i_addr != '0;
+    assign btb_entry_diff   = btb_entry_exists && bus_i.btb_entry.target_addr != br_bus_o.branch_target;
+    assign mispredict = ((br_bus_o.is_taken != bus_i.prediction) || btb_entry_diff ) & bus_i.is_branch; 
+    assign flush_o = mispredict ;
     
 
     always_comb begin : blockName
@@ -20,6 +27,9 @@ module branch_unit
         br_bus_o.is_taken       = 1'b0;
         br_bus_o.branch_target  = 32'b0;
         br_bus_o.i_addr = '0;
+        br_bus_o.mispredict = '0;
+        br_bus_o.mispredict_target = '0;
+        force_mis = 0;
         if (bus_i.is_branch) begin 
             if(bus_i.alu_op[4:3] == core::BRANCH_PRFX) begin
                 br_bus_o.branch_target = bus_i.pc + bus_i.imm;
@@ -29,7 +39,6 @@ module branch_unit
                         br_bus_o.is_taken = rs1_in_i == rs2_in_i;
                     end
                     core::ALU_BNE:begin
-                       // $display("%0d\n != %0d\n",rs1_in_i,rs2_in_i);
                         br_bus_o.is_taken = rs1_in_i != rs2_in_i;
                     end
                     core::ALU_BLT:begin
@@ -62,7 +71,21 @@ module branch_unit
                 end
                 
             end
+        
+            
+               // $display("PRED : %0b\n",bus_i.prediction);
+                br_bus_o.mispredict = mispredict;
+                if(btb_entry_diff)
+                    br_bus_o.mispredict_target = br_bus_o.branch_target;
+                else if(bus_i.prediction & ~br_bus_o.is_taken)
+                    br_bus_o.mispredict_target = bus_i.pc + 4;
+                else if(~bus_i.prediction & br_bus_o.is_taken) begin
+                    br_bus_o.mispredict_target = br_bus_o.branch_target;
+                   // $display("PC BR : %0x TARGET : %0x\n",bus_i.pc,br_bus_o.branch_target);
+                end
+            
         end
+                
         else begin
             ;
         end

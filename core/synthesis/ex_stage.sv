@@ -18,7 +18,7 @@ module ex_stage
     bit pipeline_stalled;
     core::pipeline_bus_t ex_bus;
     core::mem_cntrl_bus_t ex2mem;
-   
+    
     logic [31:0] rd_branch; 
     logic [31:0] rs1_in;
     logic [31:0] rs2_in;

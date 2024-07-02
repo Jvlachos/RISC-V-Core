@@ -66,6 +66,11 @@ package core;
     localparam DATA_BYTES = DATA_WIDTH/8;
     localparam MEM_OP_BITS = $bits(MEM_OP_t);
 
+    typedef struct packed {
+        logic [31:0] i_addr;
+        logic [31:0] target_addr;
+    } btb_entry_t;
+
 
 
     typedef struct packed {
@@ -87,6 +92,8 @@ package core;
         logic [DATA_BYTES-1:0] mem_w_en;
         bit rf_wr_en;
         bit pipeline_stall;
+        bit prediction;
+        btb_entry_t btb_entry;
     } pipeline_bus_t;
 
     localparam BUS_BITS = $bits(pipeline_bus_t);
@@ -94,6 +101,8 @@ package core;
         bit is_taken;
         logic [31:0] branch_target;
         logic [31:0] i_addr;
+        bit mispredict;
+        logic [31:0] mispredict_target;
     } br_cntrl_bus_t;
 
     typedef struct packed {
@@ -133,15 +142,10 @@ package core;
         logic [31:0] rd;
     } bypass_bus_t;
  
-    typedef struct packed {
-        logic [31:0] i_addr;
-        logic [31:0] target_addr;
-    } btb_entry_t;
-
-    localparam BTB_ENTRY_SIZE = $bits(btb_entry_t);
+        localparam BTB_ENTRY_SIZE = $bits(btb_entry_t);
     localparam BTB_SIZE       = 4096;
     localparam GHR_SIZE         = 8;
-    localparam COUNTER_TABLE_SZ = 1024;
+    localparam COUNTER_TABLE_SZ = 4096;
     localparam COUNTER_BITS     = 2;
     
     typedef enum logic[COUNTER_BITS-1:0] {
@@ -160,6 +164,9 @@ package core;
         logic [GHR_SIZE-1:0] GHR;
     } GHR_t;
 
+    localparam GHR_SELECT = 2;
+    
+    localparam PC_SELECT  = 10;
     localparam COUNTER_TABLE_BITS = $clog2(COUNTER_TABLE_SZ);
-
+ 
   endpackage

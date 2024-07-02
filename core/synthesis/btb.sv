@@ -33,7 +33,7 @@ always @(posedge clk) begin
     if(is_branch_i & wen) begin
        btb[i_waddr].i_addr <= br_cntrl_i.i_addr;
        btb[i_waddr].target_addr <= br_cntrl_i.branch_target;
-       $display("PC : %x TARGET : %x\n",br_cntrl_i.i_addr,br_cntrl_i.branch_target);
+     //  $display("PC : %x TARGET : %x\n",br_cntrl_i.i_addr,br_cntrl_i.branch_target);
     end
     else if (rm) 
         btb[i_waddr] <= '0;
@@ -42,28 +42,7 @@ end
 
 assign #DH entry_o = btb[read_addr_i];
 
-// alternative #1
-//assign #DH o_rdata_a = (i_raddr_a == 0) ? 0 : rf[i_raddr_a];
-//assign #DH o_rdata_b = (i_raddr_b == 0) ? 0 : rf[i_raddr_b];
-/*
-// alternative #2
-always_comb begin
-  o_rdata_a = 0;
-  o_rdata_b = 0;
-  if ( i_raddr_a != 0 ) o_rdata_a = rf[i_raddr_a];
-  if ( i_raddr_b != 0 ) o_rdata_b = rf[i_raddr_b];
 
-
-//if      ( i_raddr_a == 0 )            o_rdata_a = 0;
-//else if ( i_raddr_a == i_waddr )      o_rdata_a = i_wdata;
-//else                                  o_rdata_a = rf[i_raddr_a];
-//
-//if      ( i_raddr_b == 0 )            o_rdata_b = 0;
-//else if ( i_raddr_b == i_waddr )      o_rdata_b = i_wdata;
-//else                                  o_rdata_b = rf[i_raddr_b];
-
-end
-*/
 
 // not needed for alternatives
 initial begin
