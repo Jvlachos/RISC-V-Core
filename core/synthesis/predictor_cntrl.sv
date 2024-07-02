@@ -24,11 +24,19 @@ module predictor_cntrl
     core::cntr_pattern_t curr_state;
     core::cntr_pattern_t next_state;
     bit taken;
+    logic [core::COUNTER_TABLE_BITS-1:0] tmp;
+
+  //  assign tmp = {GHR_ff[ghr_sel:0],read_addr_i[12:5]};
+    
     assign taken = br_cntrl_i.is_taken;
     
-    assign r_addr = {GHR_ff[ghr_sel:0],read_addr_i[pc_sel:0]};
-    assign r_addr_b = {GHR_ff[ghr_sel:0],read_addr_b_i[pc_sel:0]};
-    assign w_addr = {GHR_ff[ghr_sel:0],br_cntrl_i.i_addr[pc_sel:0]};
+    assign r_addr = {GHR_ff[ghr_sel:0] ,read_addr_i[2+:pc_sel]};
+    assign r_addr_b = {GHR_ff[ghr_sel:0],read_addr_b_i[2+:pc_sel]};
+    assign w_addr = {GHR_ff[ghr_sel:0] , br_cntrl_i.i_addr[2+:pc_sel]};
+
+    // assign r_addr = tmp ^ read_addr_i[4:0];
+    //assign r_addr_b = tmp ^ read_addr_i[4:0];
+    //ssign w_addr   = {GHR_ff[ghr_sel:0],br_cntrl_i.i_addr[4:0]} ^ br_cntrl_i.i_addr[6:0];
 
 
     assign #DH prediction_o = cntr_table[r_addr].counter[1];

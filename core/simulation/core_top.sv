@@ -39,6 +39,15 @@ module core_top;
     assign exmemop = id_bus.mem_op;
     bit prediction;
     bit pred2id;
+    core::metrics_t metrics;
+
+
+    metrics_cntrl metrics_control(
+        .clk(clk),
+        .rst(rst),
+        .metrics_o(metrics),
+        .ex_bus(ex_bus),
+        .flush_i(pipeline_flush));
 
     btb_cntrl btb_control(
         .clk(clk),
@@ -158,7 +167,18 @@ module core_top;
         //if(cycle_no > 1000)
           // $finish;
     end
-
+    function metric_disp;
+        int total,total_br,jumps,cond,mis;
+        real mis_rate;
+        total = metrics.total_ins;
+         total_br = metrics.br_metrics.no_conditional + metrics.br_metrics.no_jumps;
+         jumps = metrics.br_metrics.no_jumps;
+         cond = metrics.br_metrics.no_conditional;
+         mis  = metrics.br_metrics.mispredictions;
+         mis_rate = (mis/total_br)*100;
+        $display("Instructions Executed: \t%d\nTotal Branches: \t%d\n\tConditional: \t%d\n\tJumps: \t\t%d\n\tMispredicted: \t%d\n\tMispred Rate: \t%0.2f\n",metrics.total_ins,total_br,cond,jumps,mis,(real'(mis)/real'(total_br))*100.00);
+        
+    endfunction
 
     task display_all();
         display_bus(id_bus,"ID/EX");

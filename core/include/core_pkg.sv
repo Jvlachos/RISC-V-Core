@@ -164,9 +164,22 @@ package core;
         logic [GHR_SIZE-1:0] GHR;
     } GHR_t;
 
-    localparam GHR_SELECT = 2;
+    localparam GHR_SELECT = 8;
     
-    localparam PC_SELECT  = 10;
+    localparam PC_SELECT  = 4;
     localparam COUNTER_TABLE_BITS = $clog2(COUNTER_TABLE_SZ);
  
+
+    typedef struct packed {
+        logic [31:0] mispredictions;
+        logic [31:0] no_conditional;
+        logic [31:0] no_jumps;
+
+    } br_metrics_t;
+
+    typedef struct packed {
+        br_metrics_t br_metrics;
+        logic [31:0] total_ins;
+    } metrics_t;
+
   endpackage

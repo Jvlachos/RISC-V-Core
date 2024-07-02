@@ -33,6 +33,7 @@ input[ADDR_WIDTH-1:0] addr;
       $display("Simulation finished at time (%t) with write to halt address (0x%h = %d)!",$time,addr, data);
       $display("main() return value = %d", data);
       $display("CYCLES : %d\n",cycle);
+      metric_disp();
       if(data == 0)
         $display("PASS");
       else
