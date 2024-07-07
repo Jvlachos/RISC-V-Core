@@ -7,6 +7,10 @@ clean:
 comp:
 	vcs -sverilog -f tb.f  -kdb core_top.sv  -debug_all  -l comp.log
 
+verif:
+	vcs -sverilog -f tb.f ../verification/assert_if.sv -kdb core_top.sv  -debug_all  -l comp.log
+
+
 run:
 	./simv -l sim.log > log && cat log
 

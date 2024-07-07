@@ -144,9 +144,10 @@ package core;
  
         localparam BTB_ENTRY_SIZE = $bits(btb_entry_t);
     localparam BTB_SIZE       = 4096;
-    localparam GHR_SIZE         = 8;
+    localparam GHR_SIZE         = 4;
     localparam COUNTER_TABLE_SZ = 4096;
     localparam COUNTER_BITS     = 2;
+    localparam BTB_ADDR_WIDTH   = $clog2(BTB_SIZE);
     
     typedef enum logic[COUNTER_BITS-1:0] {
         STRONGLY_NOT_TAKEN = 2'b00,
@@ -164,9 +165,9 @@ package core;
         logic [GHR_SIZE-1:0] GHR;
     } GHR_t;
 
-    localparam GHR_SELECT = 8;
+    localparam GHR_SELECT = 2;
     
-    localparam PC_SELECT  = 4;
+    localparam PC_SELECT  = 10;
     localparam COUNTER_TABLE_BITS = $clog2(COUNTER_TABLE_SZ);
  
 

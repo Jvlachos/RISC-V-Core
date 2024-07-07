@@ -15,7 +15,7 @@ module ex_stage
     output logic [31:0] ld_addr
 );
 
-    bit pipeline_stalled;
+   // bit pipeline_stalled;
     core::pipeline_bus_t ex_bus;
     core::mem_cntrl_bus_t ex2mem;
     

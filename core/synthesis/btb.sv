@@ -20,8 +20,8 @@ localparam BTB_WORDS =  core::BTB_SIZE;
 core::btb_entry_t btb [0 : BTB_WORDS-1];
 logic wen;
 logic rm;
-logic [core::ADDR_WIDTH-1:0] i_waddr;
-assign i_waddr = br_cntrl_i.i_addr[core::ADDR_WIDTH+1:2];
+logic [core::BTB_ADDR_WIDTH-1:0] i_waddr;
+assign i_waddr = br_cntrl_i.i_addr[core::BTB_ADDR_WIDTH+1:2];
 
 assign wen = br_cntrl_i.is_taken;
 assign rm  = ~wen;

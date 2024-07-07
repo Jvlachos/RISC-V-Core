@@ -17,6 +17,7 @@ module mem_sync_sp_rvdmem #(
   output logic [DATA_WIDTH-1:0]   o_rdata
 );
 
+logic [DATA_WIDTH-1:0] cycle = 0;
 //---------------------------------------------------------------------------//
 // CUSTOM CODE FOR RISCV SIMULATION
 function sim_control;
@@ -33,7 +34,8 @@ input[ADDR_WIDTH-1:0] addr;
       $display("Simulation finished at time (%t) with write to halt address (0x%h = %d)!",$time,addr, data);
       $display("main() return value = %d", data);
       $display("CYCLES : %d\n",cycle);
-      metric_disp();
+      
+      metric_disp(cycle);
       if(data == 0)
         $display("PASS");
       else
@@ -47,7 +49,6 @@ input[ADDR_WIDTH-1:0] addr;
   end
 endfunction
 
-logic [DATA_WIDTH-1:0] cycle = 0;
 always @(posedge clk) begin
   cycle <= cycle + 1;
 end

@@ -167,7 +167,7 @@ module core_top;
         //if(cycle_no > 1000)
           // $finish;
     end
-    function metric_disp;
+    function metric_disp(int cycle_count);
         int total,total_br,jumps,cond,mis;
         real mis_rate;
         total = metrics.total_ins;
@@ -176,7 +176,7 @@ module core_top;
          cond = metrics.br_metrics.no_conditional;
          mis  = metrics.br_metrics.mispredictions;
          mis_rate = (mis/total_br)*100;
-        $display("Instructions Executed: \t%d\nTotal Branches: \t%d\n\tConditional: \t%d\n\tJumps: \t\t%d\n\tMispredicted: \t%d\n\tMispred Rate: \t%0.2f\n",metrics.total_ins,total_br,cond,jumps,mis,(real'(mis)/real'(total_br))*100.00);
+        $display("CPI: \t%0.2f\nInstructions Executed: \t%d\nTotal Branches: \t%d\n\tConditional: \t%d\n\tJumps: \t\t%d\n\tMispredicted: \t%d\n\tMispred Rate: \t%0.2f\n",real'(cycle_count)/real'(metrics.total_ins),metrics.total_ins,total_br,cond,jumps,mis,(real'(mis)/real'(total_br))*100.00);
         
     endfunction
 
