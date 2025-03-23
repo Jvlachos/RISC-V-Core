@@ -47,7 +47,7 @@ module mem_stage
 
     mem_sync_sp_rvdmem #
     (.DATA_WIDTH(core::DATA_WIDTH),
-    .INIT_FILE("/home/dvlachos/probranch/RISC-V-Core/code/ihex/codemem.hex"))
+    .INIT_FILE("D:\\Projects\\TM-NoC\\hw\\RISC-V-Core\\code\\ihex\\codemem.hex"))
     memory_instance(
         .clk(clk),
         .i_addr(mem_cntrl_i.addr),
