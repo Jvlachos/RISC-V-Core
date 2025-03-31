@@ -26,7 +26,7 @@ module if_stage
     logic [31:0] instr;
 
     mem_sync_sp 
-    #(.INIT_FILE("/home/dvlachos/probranch/RISC-V-Core/code/ihex/code.hex"),
+    #(.INIT_FILE("D:\\Projects\\TM-NoC\\hw\\RISC-V-Core\\code\\ihex\\code.hex"),
       .ADDR_WIDTH(core::ADDR_WIDTH),
       .DEPTH(core::DEPTH),
       .DATA_WIDTH(core::DATA_WIDTH),
