@@ -1,6 +1,6 @@
 #! /bin/bash
 
-source /eda/cs523/2024s/riscv/code/rv32i-settings.sh
+#source /eda/cs523/2024s/riscv/code/rv32i-settings.sh
 
 echo "producing hex file from File :$1"
 
