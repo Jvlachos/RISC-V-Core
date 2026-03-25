@@ -38,3 +38,11 @@ _getcycle:
   lw a0, 0(t1)
   ret
   nop
+
+.global _put_noc
+.type _put_noc, @function
+_put_noc:
+  la t1, _noc_start
+  sw a0, 0(t1)
+  ret
+  nop

@@ -4,6 +4,7 @@ EX2="fib"
 EX3="coremark"
 EX4="overflow"
 EX5="example5"
+NOC="noc"
 src=""
 
 if [ $1 = "example1" ]; then
@@ -16,14 +17,15 @@ elif [ $1 = "example4" ]; then
     src=$EX4
 elif [ $1 = "example5" ]; then
     src=$EX5
+elif [ $1 = "noc" ]; then
+    src=$NOC
 fi
 
 source ../code/rv32i-settings.sh
 
 cd  ../code/"$1" &&
 make clean && make &&
-cp "$src".imem.dat  ../ihex/code.hex 
-cp "$src".dmem.dat ../ihex/codemem.hex 
-
+cp "$src".imem.dat  ../ihex/code.hex &&
+cp "$src".dmem.dat ../ihex/codemem.hex &&
 make clean
 echo done!

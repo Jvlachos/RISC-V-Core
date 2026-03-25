@@ -7,7 +7,8 @@ module mem_stage
    input core::pipeline_bus_t bus_i,
    input core::mem_cntrl_bus_t mem_cntrl_i,
    output core::pipeline_bus_t mem_bus_o,
-   output core::bypass_bus_t mem_bp_o
+   output core::bypass_bus_t mem_bp_o,
+   output mem_bus_if mem_if_master_o
    
 );
 
@@ -19,6 +20,8 @@ module mem_stage
     core::mem_cntrl_bus_t store_cntrl;
     core::pipeline_bus_t mem2se;
     core::pipeline_bus_t mem2wb;
+    logic [DATA_BYTES-1:0] mem_write_en;
+    logic [31:0]           mem_w_data;
     
     always_ff@(posedge clk,negedge rst) begin
         if(~rst) 
@@ -47,15 +50,38 @@ module mem_stage
 
     mem_sync_sp_rvdmem #
     (.DATA_WIDTH(core::DATA_WIDTH),
-    .INIT_FILE("/home/dvlachos/probranch/RISC-V-Core/code/ihex/codemem.hex"))
+    .INIT_FILE("C:\\Users\\Dimitris\\Desktop\\TM-NoC\\hw\\RISC-V-Core\\code\\ihex\\codemem.hex"))
     memory_instance(
         .clk(clk),
         .i_addr(mem_cntrl_i.addr),
-        .i_wdata(store_cntrl.w_data),
-        .i_wen(store_cntrl.write_en),
+        .i_wdata(mem_w_data),
+        .i_wen(mem_write_en),
         .o_rdata(rdata)
     );
-
+    
+    always_comb begin : peripheral_store_cntrl
+        mem_write_en ='0;
+        mem_w_data   ='0;
+        mem_if_master_o.write_en = '0;
+        mem_if_master_o.addr     = '0;
+        mem_if_master_o.w_data   = '0;
+        if(unsigned'(mem_cntrl_i.addr) > DEPTH) begin
+            mem_write_en = '0;
+            mem_w_data   = '0;
+            mem_if_master_o.write_en = store_cntrl.write_en;
+            mem_if_master_o.addr     = mem_cntrl_i.addr;
+            mem_if_master_o.w_data   = store_cntrl.w_data;
+        end
+        else begin
+            mem_write_en = store_cntrl.write_en;
+            mem_w_data   = store_cntrl.w_data;
+            mem_if_master_o.write_en = '0;
+            mem_if_master_o.addr     = '0;
+            mem_if_master_o.w_data   = '0;
+        end
+    
+    end
+    
     always_ff @( posedge clk,negedge rst ) begin : blockName
        if(~rst) begin
             mem_bus_o[core::BUS_BITS-1:0] <= '0;

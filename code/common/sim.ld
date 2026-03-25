@@ -12,6 +12,7 @@ MEMORY
 {
   imem  : ORIGIN = 0x00000000, LENGTH = 16K
   dmem  : ORIGIN = 0x00008000, LENGTH = 16K
+  nocmem : ORIGIN = 0x00080000, LENGTH = 16K 
 }
 
 /* we define a 4KByte stack that starts at the end of dmem */
@@ -27,6 +28,7 @@ _console_addr   = 0x40;
 _halt_addr      = 0x50;
 /* cycle counter address */
 _cycle_addr     = 0x60;
+_noc_start      = 0x80000;
 
 SECTIONS
 {
@@ -52,6 +54,13 @@ SECTIONS
       *(.bss .bss.*)
       PROVIDE(_bss_end = .);
     } > dmem
+
+  .nocmem : {
+      . = ALIGN(8);
+      PROVIDE(_nocmem_start = .);
+      *(.nocmem*)
+      PROVIDE(_nocmem_end = .);
+    } > nocmem
 
     /DISCARD/ : {
       *(.comment .comment.* .note .note.*)

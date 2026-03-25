@@ -168,7 +168,8 @@ package core;
     
     localparam PC_SELECT  = 4;
     localparam COUNTER_TABLE_BITS = $clog2(COUNTER_TABLE_SZ);
- 
+    
+    
 
     typedef struct packed {
         logic [31:0] mispredictions;
@@ -181,5 +182,6 @@ package core;
         br_metrics_t br_metrics;
         logic [31:0] total_ins;
     } metrics_t;
-
+        
+    
   endpackage

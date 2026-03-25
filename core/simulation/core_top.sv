@@ -1,13 +1,12 @@
 
-`define CLK_PERIOD 20
-
-
-
-module core_top;
+module core_top(
+    input clk,
+    input rst,
+    mem_bus_if ext_mem_bus
+);
     import core::*;
     import riscv::*;
-    logic clk = 1;
-    logic rst = 0;
+    `include "../include/mem_bus_if.sv"
     logic [core::DATA_WIDTH-1:0] instruction;
     logic [core::DATA_WIDTH-1:0] wdata;
     logic [core::DATA_BYTES-1:0] wen = 0;
@@ -15,7 +14,7 @@ module core_top;
     logic [31:0] db_i_mem [31:0]; 
     logic [31:0] pc;
     logic pipeline_flush;
-    always# (`CLK_PERIOD) clk = ~clk;
+   
     core::pipeline_bus_t id_bus;
     core::pipeline_bus_t ex_bus;
     core::br_cntrl_bus_t br_bus;
@@ -40,7 +39,7 @@ module core_top;
     bit prediction;
     bit pred2id;
     core::metrics_t metrics;
-
+    
 
     metrics_cntrl metrics_control(
         .clk(clk),
@@ -134,7 +133,8 @@ module core_top;
         .bus_i(ex_bus),
         .mem_cntrl_i(mem_cntrl),
         .mem_bus_o(mem_bus),
-        .mem_bp_o(mem_bypass));
+        .mem_bp_o(mem_bypass),
+        .mem_if_master(ext_mem_bus));
         
     wb_stage wb_s(
         .clk(clk),
@@ -148,23 +148,24 @@ module core_top;
 
     integer i_index; 
 
-    initial begin
+//    initial begin
       
-        @(posedge clk);
+//        @(posedge clk);
 
-        rst = 1;
-        while(1) begin
+//        rst = 1;
+//        while(1) begin
             
           
-            @(posedge clk);
-           // display_all();
-        end
-        $finish;
-    end
+//            @(posedge clk);
+//            //display_all();
+//        end
+//        $finish;
+//    end
 
     always @(posedge clk) begin
         cycle_no <= cycle_no + 1;
         //if(cycle_no > 1000)
+         //display_all();
           // $finish;
     end
     function metric_disp;
