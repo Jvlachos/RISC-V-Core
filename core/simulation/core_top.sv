@@ -134,7 +134,7 @@ module core_top(
         .mem_cntrl_i(mem_cntrl),
         .mem_bus_o(mem_bus),
         .mem_bp_o(mem_bypass),
-        .mem_if_master(ext_mem_bus));
+        .mem_if_master_o(ext_mem_bus));
         
     wb_stage wb_s(
         .clk(clk),

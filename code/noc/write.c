@@ -1,10 +1,12 @@
 #include "printf.h"
-#define REG1 (volatile unsigned int*)0x80000
+#include "noc.h"
 
 int main(){
-    *REG1 = 50;
-    volatile int  res = *REG1;
-    int a = 50;
+    for(int i =0; i < 16; i++){
+        *NOC_REGS[i] = 50 + i;
+    }
 
-    printf("Result %d\n", res+a);
+    for(int i =0; i < 16; i++){
+        printf("NOC_REGS[%d] = %d\n", i, *NOC_REGS[i]);
+    }
 }

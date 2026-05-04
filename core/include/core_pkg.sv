@@ -182,6 +182,8 @@ package core;
         br_metrics_t br_metrics;
         logic [31:0] total_ins;
     } metrics_t;
-        
+    
+    
+    
     
   endpackage
