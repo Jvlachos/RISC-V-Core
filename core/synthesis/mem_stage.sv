@@ -2,7 +2,7 @@ module mem_stage
     import riscv::*;
     import core::*;
     import ni_pkg::*;
-(
+#(parameter NODE_IDX = 69)(
    input logic clk,
    input logic rst,
    input core::pipeline_bus_t bus_i,
@@ -50,15 +50,30 @@ module mem_stage
         .addr_offset_i(addr[1:0]));
         
     logic isExt;
-    assign isExt = unsigned'(mem_cntrl_i.addr) >= NI_MEM_BASE && unsigned'(mem_cntrl_i.addr) < NI_MEM_END;
+    assign isExt = (unsigned'(mem_cntrl_i.addr) >= NI_MAPPED_REGS_BASE) && (unsigned'(mem_cntrl_i.addr) <= NI_MEM_END);
     logic isLoad;
     assign isLoad = mem_cntrl_i.mem_op != core::MEM_NOP && mem_cntrl_i.mem_op[MEM_OP_BITS-1] == core::LOAD_PRFX;
     logic isStore;
     assign isStore = mem_cntrl_i.mem_op != core::MEM_NOP && mem_cntrl_i.mem_op[MEM_OP_BITS-1] == core::STORE_PRFX;
+    logic isIdReg;
+    assign isIdReg = (unsigned'(mem_cntrl_i.addr) == NI_MEM_BASE );
+    
+    logic [31:0] id_reg_data;
+    
+    mem_mapped_reg #(.REG_NAME("ID_REG"), .READ_ONLY(1))
+    id_reg (
+        .clk(clk),
+        .rst_n(rst),
+        .i_per_we('0),
+        .i_per_din('0),
+        .o_per_dout(id_reg_data),
+        .i_init_data(NODE_IDX)
+    );
+    
     
     mem_sync_sp_rvdmem #
     (.DATA_WIDTH(core::DATA_WIDTH),
-    .INIT_FILE("C:\\Users\\dvlac\\Desktop\\TM-NoC\\hw\\RISC-V-Core\\code\\ihex\\codemem.hex"))
+    .INIT_FILE("C:\\Users\\Dimitris\\Desktop\\TM-NoC\\hw\\RISC-V-Core\\code\\ihex\\codemem.hex"))
     memory_instance(
         .clk(clk),
         .i_addr(mem_cntrl_i.addr),
@@ -72,6 +87,9 @@ module mem_stage
         if (isExt) begin
             ld_data <= mem_if_master_o.r_data;
         end
+        else if(isIdReg) begin
+            ld_data <= id_reg_data;
+        end
         else 
             ld_data <= rdata;
     end
@@ -83,6 +101,8 @@ module mem_stage
         mem_if_master_o.addr     = '0;
         mem_if_master_o.w_data   = '0;
         if(isExt) begin
+//           if(NODE_IDX == 1)
+//              $display("External address %0h: \n",mem_cntrl_i.addr);
             if(isLoad) begin
                 mem_write_en = '0;
                 mem_w_data   = '0;
@@ -97,8 +117,18 @@ module mem_stage
                 mem_if_master_o.write_en = store_cntrl.write_en;
                 mem_if_master_o.addr     = mem_cntrl_i.addr;
                 mem_if_master_o.w_data   = store_cntrl.w_data;
+                
  
             end
+        end
+        else if(isIdReg) begin
+             mem_write_en = '0;
+             mem_w_data   = '0;
+             mem_if_master_o.write_en = '0;
+             mem_if_master_o.addr     = '0;
+             mem_if_master_o.w_data   = '0;
+//              if(NODE_IDX == 1)
+//                $display("External address %0h: \n",mem_cntrl_i.addr);
         end
         else begin
             mem_write_en = store_cntrl.write_en;

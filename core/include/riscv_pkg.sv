@@ -227,183 +227,183 @@ package riscv;
         return {imm,rs2,rs1,{1'b0,size},offset,S_OP};        
     endfunction
 
-    function automatic print_r(string id,reg_t rs2,reg_t rs1,reg_t rd);
-        $write("%s %s,%s,%s",id,rd,rs1,rs2);
-    endfunction
+//    function automatic print_r(string id,reg_t rs2,reg_t rs1,reg_t rd);
+//        $write("%s %s,%s,%s",id,rd,rs1,rs2);
+//    endfunction
 
-    function automatic get_rr_str(string id,reg_t rs2,reg_t rs1,reg_t rd);
-        return {id,",",rs2.name(),",",rs1.name(),",",rd.name()};
-    endfunction
+//    function automatic get_rr_str(string id,reg_t rs2,reg_t rs1,reg_t rd);
+//        return {id,",",rs2.name(),",",rs1.name(),",",rd.name()};
+//    endfunction
 
-    function automatic string get_instr_str(string id,string arg1,string arg2,string arg3);
-        return {id,",",arg1,",",arg2,",",arg3};
-    endfunction
+//    function automatic string get_instr_str(string id,string arg1,string arg2,string arg3);
+//        return {id,",",arg1,",",arg2,",",arg3};
+//    endfunction
 
     
 
-  function automatic decode_instr(logic [31:0] instr);
-        riscv::instruction_t instruction;
-        riscv::reg_t rs1_t;
-        riscv::reg_t rs2_t;
-        riscv::reg_t rd_t;
-        instruction = riscv::instruction_t'(instr); 
-        $write("Instruction :");
-        case (instruction.instruction[6:0])
-            riscv::I_OP: begin
-                rs1_t = riscv::reg_t'(instruction.itype.rs1);
-                rd_t  = riscv::reg_t'(instruction.itype.rd);
+//  function automatic decode_instr(logic [31:0] instr);
+//        riscv::instruction_t instruction;
+//        riscv::reg_t rs1_t;
+//        riscv::reg_t rs2_t;
+//        riscv::reg_t rd_t;
+//        instruction = riscv::instruction_t'(instr); 
+//        $write("Instruction :");
+//        case (instruction.instruction[6:0])
+//            riscv::I_OP: begin
+//                rs1_t = riscv::reg_t'(instruction.itype.rs1);
+//                rd_t  = riscv::reg_t'(instruction.itype.rd);
 
-                //bus
+//                //bus
 
-                unique case (instruction.itype.funct3)
-                riscv::ADDI_F3: begin  
-                    if(instruction.itype.rs1 == 5'b0 &&  instruction.itype.rd == 5'b0 && instruction.itype.imm ==0 )
-                        $write("NOP");
-                    else begin;
-                       $write("addi %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
-                    end
-                end
-                riscv::SLTI_F3: begin
-                    $write("slti %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
-                end
-                riscv::SLTIU_F3:  begin
-                    $write("sltiu %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
-                end
-                riscv::XORI_F3: begin 
-                    $write("xori %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
-                end
-                riscv::ORI_F3: begin   
-                    $write("ori %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
-                end
-                riscv::ANDI_F3:  begin
-                    $write("andi %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
-                end
-                riscv::SLLI_F3: begin
-                    $write("slli %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
-                end
+//                unique case (instruction.itype.funct3)
+//                riscv::ADDI_F3: begin  
+//                    if(instruction.itype.rs1 == 5'b0 &&  instruction.itype.rd == 5'b0 && instruction.itype.imm ==0 )
+//                        $write("NOP");
+//                    else begin;
+//                       $write("addi %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+//                    end
+//                end
+//                riscv::SLTI_F3: begin
+//                    $write("slti %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+//                end
+//                riscv::SLTIU_F3:  begin
+//                    $write("sltiu %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+//                end
+//                riscv::XORI_F3: begin 
+//                    $write("xori %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+//                end
+//                riscv::ORI_F3: begin   
+//                    $write("ori %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+//                end
+//                riscv::ANDI_F3:  begin
+//                    $write("andi %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+//                end
+//                riscv::SLLI_F3: begin
+//                    $write("slli %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+//                end
 
-                riscv::SRLI_SRAI: begin 
-                    case(instruction.instruction[31:25])
-                        riscv::SRAI_func :begin
-                            $write("srai %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
-                        end
-                        riscv::SRLI_func :begin 
-                            $write("srli %s,%s,%0d",rd_t.name(),rs1_t.name(),instruction.itype.imm);
-                        end
-                        default: $write("Illegal srli_srai fun\n");
-                    endcase
-                end 
-                default: $write("Illegal I-Format Instruction!\n");
-                endcase
-            end
+//                riscv::SRLI_SRAI: begin 
+//                    case(instruction.instruction[31:25])
+//                        riscv::SRAI_func :begin
+//                            $write("srai %s,%s,%0d",rd_t.name(),rs1_t.name(),$signed(instruction.itype.imm));
+//                        end
+//                        riscv::SRLI_func :begin 
+//                            $write("srli %s,%s,%0d",rd_t.name(),rs1_t.name(),instruction.itype.imm);
+//                        end
+//                        default: $write("Illegal srli_srai fun\n");
+//                    endcase
+//                end 
+//                default: $write("Illegal I-Format Instruction!\n");
+//                endcase
+//            end
 
-            riscv::S_OP: begin 
-                rs1_t = riscv::reg_t'(instruction.stype.rs1);
-                rs2_t  = riscv::reg_t'(instruction.stype.rs2);
+//            riscv::S_OP: begin 
+//                rs1_t = riscv::reg_t'(instruction.stype.rs1);
+//                rs2_t  = riscv::reg_t'(instruction.stype.rs2);
 
-                case(instruction.stype.funct3)
+//                case(instruction.stype.funct3)
                 
-                {riscv::SIGNED, riscv::BYTE}: begin 
-                    $write("sb %s,%0d(%s)", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
-                end
-                {riscv::SIGNED, riscv::HWORD}:begin
-                    $write("sh %s,%0d(%s)", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
-                end
-                {riscv::SIGNED, riscv::WORD}: begin 
-                    $write("sw %s,%0d(%s)", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
-                end
-                default:$write("Illegal store?\n");
-                endcase
-            end          
-            riscv::L_OP: begin 
-                rs1_t = riscv::reg_t'(instruction.itype.rs1);
-                rd_t  = riscv::reg_t'(instruction.itype.rd);
-                case(instruction.itype.funct3)
-                {riscv::SIGNED,riscv::BYTE}:begin
-                    $write("lb %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
-                end
-                {riscv::SIGNED,riscv::HWORD}:begin 
-                    $write("lh %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
-                end
-                {riscv::SIGNED,riscv::WORD}:begin 
-                    $write("lw %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
-                end
-                {riscv::UNSIGNED,riscv::BYTE}:begin 
-                    $write("lbu %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
-                end
-                {riscv::UNSIGNED,riscv::HWORD}:begin 
-                    $write("lhu %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
-                end
+//                {riscv::SIGNED, riscv::BYTE}: begin 
+//                    $write("sb %s,%0d(%s)", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
+//                end
+//                {riscv::SIGNED, riscv::HWORD}:begin
+//                    $write("sh %s,%0d(%s)", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
+//                end
+//                {riscv::SIGNED, riscv::WORD}: begin 
+//                    $write("sw %s,%0d(%s)", rs2_t.name, $signed({instruction.stype.imm, instruction.stype.imm_2}), rs1_t.name);
+//                end
+//                default:$write("Illegal store?\n");
+//                endcase
+//            end          
+//            riscv::L_OP: begin 
+//                rs1_t = riscv::reg_t'(instruction.itype.rs1);
+//                rd_t  = riscv::reg_t'(instruction.itype.rd);
+//                case(instruction.itype.funct3)
+//                {riscv::SIGNED,riscv::BYTE}:begin
+//                    $write("lb %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
+//                end
+//                {riscv::SIGNED,riscv::HWORD}:begin 
+//                    $write("lh %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
+//                end
+//                {riscv::SIGNED,riscv::WORD}:begin 
+//                    $write("lw %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
+//                end
+//                {riscv::UNSIGNED,riscv::BYTE}:begin 
+//                    $write("lbu %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
+//                end
+//                {riscv::UNSIGNED,riscv::HWORD}:begin 
+//                    $write("lhu %s,%0d(%s)", rd_t.name, instruction.itype.imm, rs1_t.name);
+//                end
 
-                default:$write("Illegal load?\n");            
-                endcase
-            end
-            riscv::LUI_OP: begin; end
-            riscv::AUI_OP: begin; end
-            riscv::JAL_OP: begin; end
-            riscv::JALR_OP: begin; end
-            riscv::B_OP: begin; 
-                $write("Branch : %b",instruction.btype.funct3);
-            end
-            riscv::RR_OP: begin;
-                rs1_t = riscv::reg_t'(instruction.rtype.rs1);
-                rd_t  = riscv::reg_t'(instruction.rtype.rd);
-                rs2_t  = riscv::reg_t'(instruction.rtype.rs2);
-                unique case(instruction.rtype.funct3) 
-                riscv::ADD_SUB: begin;
-                    case(instruction.rtype.funct7)
-                        riscv::ADD_SRL_func:begin;
-                            riscv::print_r("add",rs2_t,rs1_t,rd_t);
-                        end
+//                default:$write("Illegal load?\n");            
+//                endcase
+//            end
+//            riscv::LUI_OP: begin; end
+//            riscv::AUI_OP: begin; end
+//            riscv::JAL_OP: begin; end
+//            riscv::JALR_OP: begin; end
+//            riscv::B_OP: begin; 
+//                $write("Branch : %b",instruction.btype.funct3);
+//            end
+//            riscv::RR_OP: begin;
+//                rs1_t = riscv::reg_t'(instruction.rtype.rs1);
+//                rd_t  = riscv::reg_t'(instruction.rtype.rd);
+//                rs2_t  = riscv::reg_t'(instruction.rtype.rs2);
+//                unique case(instruction.rtype.funct3) 
+//                riscv::ADD_SUB: begin;
+//                    case(instruction.rtype.funct7)
+//                        riscv::ADD_SRL_func:begin;
+//                            riscv::print_r("add",rs2_t,rs1_t,rd_t);
+//                        end
 
-                        riscv::SUB_SRA_func:begin;
-                            riscv::print_r("sub",rs2_t,rs1_t,rd_t);
-                        end
+//                        riscv::SUB_SRA_func:begin;
+//                            riscv::print_r("sub",rs2_t,rs1_t,rd_t);
+//                        end
 
-                        default:$write("Illegal add/sub?\n");
-                    endcase
-                end
-                riscv::SLL:begin;
-                    riscv::print_r("sll",rs2_t,rs1_t,rd_t);
-                end
-                riscv::SLT:begin;
-                    riscv::print_r("slt",rs2_t,rs1_t,rd_t);
-                end
-                riscv::SLTU:begin;
-                    riscv::print_r("sltu",rs2_t,rs1_t,rd_t);
-                end
-                riscv::XOR:begin;
-                    riscv::print_r("xor",rs2_t,rs1_t,rd_t);
-                end
-                riscv::SRL_SRA:begin;
-                    case(instruction.rtype.funct7)
-                        riscv::ADD_SRL_func:begin;
-                            riscv::print_r("srl",rs2_t,rs1_t,rd_t);
-                        end
-                        riscv::SUB_SRA_func:begin;
-                            riscv::print_r("sra",rs2_t,rs1_t,rd_t);
-                        end
-                        default:$write("Illegal srl/sra?\n");
-                    endcase
-                end
-                riscv::OR:begin;
-                    riscv::print_r("or",rs2_t,rs1_t,rd_t);
-                end
-                riscv::AND:begin;
-                    riscv::print_r("and",rs2_t,rs1_t,rd_t);
-                end
+//                        default:$write("Illegal add/sub?\n");
+//                    endcase
+//                end
+//                riscv::SLL:begin;
+//                    riscv::print_r("sll",rs2_t,rs1_t,rd_t);
+//                end
+//                riscv::SLT:begin;
+//                    riscv::print_r("slt",rs2_t,rs1_t,rd_t);
+//                end
+//                riscv::SLTU:begin;
+//                    riscv::print_r("sltu",rs2_t,rs1_t,rd_t);
+//                end
+//                riscv::XOR:begin;
+//                    riscv::print_r("xor",rs2_t,rs1_t,rd_t);
+//                end
+//                riscv::SRL_SRA:begin;
+//                    case(instruction.rtype.funct7)
+//                        riscv::ADD_SRL_func:begin;
+//                            riscv::print_r("srl",rs2_t,rs1_t,rd_t);
+//                        end
+//                        riscv::SUB_SRA_func:begin;
+//                            riscv::print_r("sra",rs2_t,rs1_t,rd_t);
+//                        end
+//                        default:$write("Illegal srl/sra?\n");
+//                    endcase
+//                end
+//                riscv::OR:begin;
+//                    riscv::print_r("or",rs2_t,rs1_t,rd_t);
+//                end
+//                riscv::AND:begin;
+//                    riscv::print_r("and",rs2_t,rs1_t,rd_t);
+//                end
 
-                default: $write("Illegal Rformat?\n"); 
+//                default: $write("Illegal Rformat?\n"); 
 
-                endcase
-            end
-            riscv::E_OP: begin; end
-            default: $write("Illegal Instruction!");
-        endcase
+//                endcase
+//            end
+//            riscv::E_OP: begin; end
+//            default: $write("Illegal Instruction!");
+//        endcase
 
 
 
-    endfunction
+ //   endfunction
 endpackage
 
 

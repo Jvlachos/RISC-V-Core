@@ -1,4 +1,4 @@
 BINARY=noc
-SRC_FILES=write.c printf.c util.c
+SRC_FILES=noc_tests.c printf.c util.c
 
 include ../common/Makefile.include

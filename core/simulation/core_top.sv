@@ -1,5 +1,5 @@
 
-module core_top(
+module core_top #(parameter NODE_IDX = 69)(
     input clk,
     input rst,
     mem_bus_if ext_mem_bus
@@ -127,7 +127,7 @@ module core_top(
         .ex2mem_o(mem_cntrl),
         .ld_addr(ld_addr));
 
-    mem_stage mem_s(
+    mem_stage #(.NODE_IDX(NODE_IDX)) mem_s(
         .clk(clk),
         .rst(rst),
         .bus_i(ex_bus),
@@ -192,7 +192,7 @@ module core_top(
 
     task display_bus(pipeline_bus_t curr_bus,string msg);
         $display("Cycle : %0d Stage : %s\n",cycle_no,msg);
-        riscv::decode_instr(curr_bus.instr);
+        //riscv::decode_instr(curr_bus.instr);
         $display("\nMemOp: %s\nAluOp: %s\nFormat: %s\nImm: %d\nRs1: %d\nRs2: %d\nRd: %d\nPc: 0x%h\nRs1 data: %0d\nRs2 data: %0d\nRd data: %0d\nRF: %0b\nBR: 0x%h\nST: 0x%0h\n",
         curr_bus.mem_op.name(),curr_bus.alu_op.name(),
         curr_bus.format.name(),$signed(curr_bus.imm),curr_bus.rs1,curr_bus.rs2,curr_bus.rd,curr_bus.pc,
@@ -202,9 +202,9 @@ module core_top(
     task display_side();
         $display("Cycle : %d\n",cycle_no);
         $write("\t\tID\t\t\t|\t\t\tEX\t\t\t|\t\t\tMEM\t\t\t\n");
-        riscv::decode_instr(id_bus.instr);
+       // riscv::decode_instr(id_bus.instr);
         $write("\t\t\t");
-        riscv::decode_instr(ex_bus.instr);
+       // riscv::decode_instr(ex_bus.instr);
         $write("\nMemOp: %s\t\t\t\t|\t\t MemOp: %s|\t\t MemOp: %s\nAluOp: %s\t\t\t\t|\t\t AluOp: %s\nPC: 0x%h\t\t\t\t|\t\t PC: 0x%h\n",
         id_bus.mem_op.name(),ex_bus.mem_op.name(),mem_bus.mem_op.name(),id_bus.alu_op.name(),ex_bus.alu_op.name(),id_bus.pc,ex_bus.pc);
 
