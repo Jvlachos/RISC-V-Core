@@ -6,9 +6,7 @@ module predictor_cntrl
     input core::br_cntrl_bus_t br_cntrl_i,
     input  bit is_branch_i,
     input  logic [31:0] read_addr_i,
-    input  logic [31:0] read_addr_b_i,
-    output bit prediction_o,
-    output bit pred2id
+    output bit prediction_o
 );
 
     localparam DH = 1;
@@ -16,7 +14,6 @@ module predictor_cntrl
     localparam pc_sel  = core::PC_SELECT  -1;
 
     logic [core::COUNTER_TABLE_BITS-1:0] r_addr;
-    logic [core::COUNTER_TABLE_BITS-1:0] r_addr_b;
     logic [core::COUNTER_TABLE_BITS-1:0] w_addr;
     logic [core::GHR_SIZE-1:0] GHR_ff;
     logic [core::GHR_SIZE-1:0] ghr;
@@ -30,23 +27,18 @@ module predictor_cntrl
     
     assign taken = br_cntrl_i.is_taken;
     
-    assign r_addr = {GHR_ff[ghr_sel:0] ,read_addr_i[2+:pc_sel]};
-    assign r_addr_b = {GHR_ff[ghr_sel:0],read_addr_b_i[2+:pc_sel]};
-    assign w_addr = {GHR_ff[ghr_sel:0] , br_cntrl_i.i_addr[2+:pc_sel]};
-
+    assign r_addr = {GHR_ff[ghr_sel:0] ,read_addr_i[2+:PC_SELECT]};
+    assign w_addr = {GHR_ff[ghr_sel:0] , br_cntrl_i.i_addr[2+:PC_SELECT]};
+    
     // assign r_addr = tmp ^ read_addr_i[4:0];
     //assign r_addr_b = tmp ^ read_addr_i[4:0];
     //ssign w_addr   = {GHR_ff[ghr_sel:0],br_cntrl_i.i_addr[4:0]} ^ br_cntrl_i.i_addr[6:0];
-
-
     assign #DH prediction_o = cntr_table[r_addr].counter[1];
-    assign #DH pred2id = cntr_table[r_addr_b].counter[1];
-    
-
+   
     always @(posedge clk,negedge rst) begin
         if(~rst)
             GHR_ff <= '0;
-        else if(is_branch_i) begin
+        else if(br_cntrl_i.branch_resolved) begin
             cntr_table[w_addr].counter <= next_state;
             GHR_ff <= ghr;
            // $display("COUNTER %b GHR %b ADDR %0d PC : %x Taken : %0b\n ",next_state,ghr,w_addr,br_cntrl_i.i_addr,taken);
@@ -58,7 +50,7 @@ module predictor_cntrl
         curr_state = cntr_table[w_addr].counter;
         //next_state = core::STRONGLY_NOT_TAKEN;
         ghr = '0;
-        if(is_branch_i) begin
+        if(br_cntrl_i.branch_resolved) begin
             ghr = GHR_ff << 1;
             ghr[0] = taken;
             unique case (curr_state)

@@ -103,6 +103,7 @@ package core;
         logic [31:0] i_addr;
         bit mispredict;
         logic [31:0] mispredict_target;
+        logic branch_resolved;
     } br_cntrl_bus_t;
 
     typedef struct packed {

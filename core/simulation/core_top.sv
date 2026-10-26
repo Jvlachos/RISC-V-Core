@@ -37,7 +37,6 @@ module core_top #(parameter NODE_IDX = 69)(
     core::btb_entry_t btb_entry;
     assign exmemop = id_bus.mem_op;
     bit prediction;
-    bit pred2id;
     core::metrics_t metrics;
     
 
@@ -46,7 +45,8 @@ module core_top #(parameter NODE_IDX = 69)(
         .rst(rst),
         .metrics_o(metrics),
         .ex_bus(ex_bus),
-        .flush_i(pipeline_flush));
+        .flush_i(pipeline_flush),
+        .br_cntrl_i(br_bus));
 
     btb_cntrl btb_control(
         .clk(clk),
@@ -56,15 +56,24 @@ module core_top #(parameter NODE_IDX = 69)(
         .is_branch_i(id_bus.is_branch)
     );
 
-    predictor_cntrl predictor_cntrl(
-        .clk(clk),
-        .rst(rst),
-        .br_cntrl_i(br_bus),
-        .is_branch_i(id_bus.is_branch),
-        .read_addr_i(pc),
-        .read_addr_b_i(pc),
-        .prediction_o(prediction),
-        .pred2id(pred2id));
+//    predictor_cntrl predictor_cntrl(
+//        .clk(clk),
+//        .rst(rst),
+//        .br_cntrl_i(br_bus),
+//        .is_branch_i(id_bus.is_branch),
+//        .read_addr_i(pc),
+//        .prediction_o(prediction));
+
+    bimodal bimodal (
+        .clock(clk),
+        .reset(rst),
+        .io_br_cntrl_i_is_taken(br_bus.is_taken),
+        .io_br_cntrl_i_i_addr(br_bus.i_addr),
+        .io_is_branch_i(id_bus.is_branch),
+        .io_read_addr_i(pc),
+        .io_prediction_o(prediction),
+        .io_br_cntrl_i_branch_resolved(br_bus.branch_resolved)
+    );
 
     fw_controller fw_control(
         .clk(clk),
@@ -170,14 +179,14 @@ module core_top #(parameter NODE_IDX = 69)(
     end
     function metric_disp;
         int total,total_br,jumps,cond,mis;
-        real mis_rate;
+        
         total = metrics.total_ins;
          total_br = metrics.br_metrics.no_conditional + metrics.br_metrics.no_jumps;
          jumps = metrics.br_metrics.no_jumps;
          cond = metrics.br_metrics.no_conditional;
          mis  = metrics.br_metrics.mispredictions;
-         mis_rate = (mis/total_br)*100;
-        $display("Instructions Executed: \t%d\nTotal Branches: \t%d\n\tConditional: \t%d\n\tJumps: \t\t%d\n\tMispredicted: \t%d\n\tMispred Rate: \t%0.2f\n",metrics.total_ins,total_br,cond,jumps,mis,(real'(mis)/real'(total_br))*100.00);
+         
+        $display("Instructions Executed: \t%d\nTotal Branches: \t%d\n\tConditional: \t%d\n\tJumps: \t\t%d\n\tMispredicted: \t%d\n\tMispred Rate: \t%0.2f\n",metrics.total_ins,total_br,cond,jumps,mis,(real'(mis)/real'(cond))*100.00);
         
     endfunction
 

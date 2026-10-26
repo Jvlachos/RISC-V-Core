@@ -12,11 +12,11 @@ int fib(int n) {
 int main() {
   int i = 0;
  
-//  printf("Fibonacci series terms are:\n");
+  printf("Fibonacci series terms are:\n");
  
-//  for (i = 1; i <= N; i++) {
-//    printf("fib(%d) = %d\n",i, fib(i));
-//  }
+   for (i = 1; i <= N; i++) {
+     printf("fib(%d) = %d\n",i, fib(i));
+   }
  
   return fib(N);
 }
